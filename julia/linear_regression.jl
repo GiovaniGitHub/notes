@@ -22,7 +22,7 @@ end
 
 
 function main()
-    PATH_FILE = "/home/nobrega/Documents/project/dataset/boston.txt"
+    PATH_FILE = "dataset/boston.txt"
     df = DataFrame(CSV.File(PATH_FILE))
     n_rows, n_cols = size(df)
     
