@@ -20,7 +20,7 @@ def estimate_coef(x, y):
 
 
 if __name__ == "__main__":
-    PATH_FILE = "dataset/simple_regression.csv"
+    PATH_FILE = "../dataset/simple_regression.csv"
     df = pd.read_csv(PATH_FILE)
     n_rows, n_cols = df.shape
 

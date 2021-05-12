@@ -17,12 +17,12 @@ function estimate_coef_matrix(X:: Matrix{Float64}, y::Vector{Float64})
 
     beta = inv(transpose(X) * X) * transpose(X) * y
 
-    return beta[1:length(beta)-1], last(beta)
+    return beta[1:length(beta)-1], beta[length(beta)]
 end
 
 
 function main()
-    PATH_FILE = "dataset/boston.txt"
+    PATH_FILE = "../dataset/linear_regression.txt"
     df = DataFrame(CSV.File(PATH_FILE))
     n_rows, n_cols = size(df)
     

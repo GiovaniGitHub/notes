@@ -1,9 +1,9 @@
 # Notes
 
 # Languages
-## Julia
-## Python
+* Julia
+* Python
 
 # Algorithms
-## Linear Regression
-## Simple Linear Regression
+* Linear Regression
+* Simple Linear Regression

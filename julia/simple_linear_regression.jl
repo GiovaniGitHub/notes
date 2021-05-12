@@ -29,7 +29,7 @@ end
 
 
 function main()
-    PATH_FILE = "dataset/simple_regression.csv"
+    PATH_FILE = "../dataset/simple_regression.csv"
     df = DataFrame(CSV.File(PATH_FILE))
     n_rows, n_cols = size(df)
     
