@@ -26,8 +26,13 @@ if __name__ == "__main__":
     x = df.income.values
     y = df.happiness.values
 
-    b_0, b_1, r= estimate_coef(x,y)
+    b_0, b_1, residual = estimate_coef(x,y)
 
-    print("b_0: ", b_0)
-    print("b_1: ", b_1)
-    print("residual: ", r)
+    y_hat = b_1 * x + b_0
+    
+    from matplotlib import pyplot as plt
+    
+    plt.scatter(x, y, c='k', label='Original')
+    plt.scatter(x, y_hat, c='g', label= 'Predicted')
+    plt.legend()
+    plt.show()

@@ -1,5 +1,5 @@
 import pandas as pd 
-from numpy import dot, sum, mean, zeros, array, random
+from numpy import dot, sum, mean, zeros, array
 
 
 def r2_score(y, y_hat):
@@ -28,7 +28,7 @@ def gradient_descendent(x, y, y_hat):
     return dw, db
 
 
-def train(x,y, degrees, epochs, lr):
+def estimate_coef(x,y, degrees, epochs, lr):
     X = expand_matrix(x, degrees)
     
     _, n_cols = X.shape
@@ -49,7 +49,7 @@ def train(x,y, degrees, epochs, lr):
     return w, b, losses
 
 
-def train_with_batch(x, y, bs, degrees, epochs, lr):
+def estimate_coef_with_batch(x, y, bs, degrees, epochs, lr):
     X = expand_matrix(x, degrees)
     
     n_rows, n_cols = X.shape
@@ -84,11 +84,21 @@ if __name__ == "__main__":
     df = pd.read_csv(PATH_FILE)
 
     
-    x = df.x.values
+    X = df.x.values
     y = df.y.values
     y = y.reshape(len(y),1)
 
-    w, b, l = train(x, y, degrees=12, epochs=6000, lr=0.01)
+    weights, bias, losses = estimate_coef(X, y, degrees=12, epochs=6000, lr=0.01)
+    
+    X_expanded = expand_matrix(X, 12)
+    y_hat = dot(X_expanded, weights) + bias
+    
+    loss = mse(y, y_hat)
+    
     from matplotlib import pyplot as plt
-    plt.plot(l)
+    
+    plt.plot(y, c='k', label='Original')
+    plt.plot(y_hat, c='g', label= 'Predicted')
+    plt.legend()
     plt.show()
+    
