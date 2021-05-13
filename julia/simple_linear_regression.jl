@@ -9,6 +9,7 @@
 using DataFrames
 using CSV
 using Statistics
+using Plots
 
 function estimate_coef(x:: Vector{Float64}, y :: Vector{Float64})
     n = length(x)
@@ -31,15 +32,17 @@ end
 function main()
     PATH_FILE = "../dataset/simple_regression.csv"
     df = DataFrame(CSV.File(PATH_FILE))
-    n_rows, n_cols = size(df)
-    
+
     y = df.happiness
     x = df.income
 
     b_0, b_1, r= estimate_coef(x,y)
-    println("b_0: ", b_0)
-    println("b_1: ", b_1)
-    print("residual: ", r)
+
+    y_hat = b_1 .* x .+ b_0
+    yy = [y,y_hat]
+
+    pp = plot(x, yy, title = "Simple Linear Regression",seriestype = :scatter, label = ["Original" "Predicted"], lw = 2)
+    savefig(pp, "simple_linear_regression.png")
 end
 
 main()
