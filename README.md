@@ -7,3 +7,4 @@
 # Algorithms
 * Linear Regression
 * Simple Linear Regression
+* Polynomial Regression
