@@ -1,16 +1,11 @@
 import pandas as pd 
-from numpy import dot, sum, mean, zeros, array
+from numpy import dot, sum, mean, zeros, array, random
 
 
 def r2_score(y, y_hat):
     return 1 - (sum((array(y_hat)-array(y))**2)/
                 sum((array(y)-mean(array(y)))**2))
     
-    
-def predict(X, w, b, degrees):
-    x1 = expand_matrix(X, degrees)
-    return dot(x1, w) + b
-
 
 def expand_matrix(x, degrees):
     result = []
@@ -25,53 +20,75 @@ def mse(y, y_hat):
     return loss
 
 
-def gradients(x, y, y_hat):
+def gradient_descendent(x, y, y_hat):
     n_rows,_ = x.shape
     dw = (1/n_rows)*dot(x.T, (y_hat - y))
     db = (1/n_rows)*sum((y_hat - y)) 
     
     return dw, db
 
-def train(x, y, bs, degrees, epochs, lr):
+
+def train(x,y, degrees, epochs, lr):
+    X = expand_matrix(x, degrees)
+    
+    _, n_cols = X.shape
+    
+    w = zeros((n_cols,1))
+    b = 0
+    
+    losses = []
+    for _ in range(epochs):
+        y_hat = dot(X, w) + b
+        dw, db = gradient_descendent(X, y, y_hat)
+        w -= lr*dw
+        b -= lr*db
+
+        error = mse(y, dot(X, w) + b)
+        losses.append(error)
+
+    return w, b, losses
+
+
+def train_with_batch(x, y, bs, degrees, epochs, lr):
     X = expand_matrix(x, degrees)
     
     n_rows, n_cols = X.shape
     
-    w = zeros((1,n_cols))
+    w = zeros((n_cols,1))
     b = 0
     
     losses = []
     
-    for epoch in range(epochs):
+    for _ in range(epochs):
         for i in range((n_rows-1)//bs + 1):
             
             start_i = i*bs
             end_i = start_i + bs
             Xb = X[start_i:end_i]
             yb = y[start_i:end_i,:]
-            # (1,n) (n, 1)
-            y_hat = dot(Xb, w.T) + b
+            y_hat = dot(Xb, w) + b
             
-            dw, db = gradients(Xb, yb, y_hat)
+            dw, db = gradient_descendent(Xb, yb, y_hat)
             
-            w -= lr*dw.T
+            w -= lr*dw
             b -= lr*db
         
-        l = mse(y, dot(X, w.T) + b)
-        losses.append(l)
+        error = mse(y, dot(X, w) + b)
+        losses.append(error)
         
     return w, b, losses
 
 
 if __name__ == "__main__":
-    PATH_FILE = "dataset/simple_regression.csv"
+    PATH_FILE = "../dataset/polynomial_regression_data.csv"
     df = pd.read_csv(PATH_FILE)
-    n_rows, n_cols = df.shape
 
-    x = df.income.values
-    y = df.happiness.values
     
-    y = y.reshape((len(y),1))
+    x = df.x.values
+    y = df.y.values
+    y = y.reshape(len(y),1)
 
-    w, b, l = train(x, y, bs=10, degrees=4, epochs=2, lr=0.01)
-    print(w)
+    w, b, l = train(x, y, degrees=12, epochs=6000, lr=0.01)
+    from matplotlib import pyplot as plt
+    plt.plot(l)
+    plt.show()
