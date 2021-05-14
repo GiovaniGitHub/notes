@@ -36,12 +36,12 @@ function main()
     y = df.happiness
     x = df.income
 
-    b_0, b_1, r= estimate_coef(x,y)
+    b_0, b_1, r = estimate_coef(x,y)
 
     y_hat = b_1 .* x .+ b_0
     yy = [y,y_hat]
 
-    pp = plot(x, yy, title = "Simple Linear Regression",seriestype = :scatter, label = ["Original" "Predicted"], lw = 2)
+    pp = plot(x, yy, title = "Simple Linear Regression: \n $r",seriestype = :scatter, label = ["Original" "Predicted"], lw = 2)
     savefig(pp, "simple_linear_regression.png")
 end
 

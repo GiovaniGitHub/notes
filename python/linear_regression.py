@@ -15,7 +15,7 @@ def estimate_coef(X,y):
     
 
 if __name__ == "__main__":
-    df = pd.read_csv('../dataset/linear_regression.txt')
+    df = pd.read_csv('../dataset/linear_regression.csv')
     y = df.MEDV.values
     X = df[df.columns.drop('MEDV')].values
     
