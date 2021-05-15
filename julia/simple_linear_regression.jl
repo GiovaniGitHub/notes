@@ -8,7 +8,6 @@
 # Load the installed packages
 using DataFrames
 using CSV
-using Statistics
 using Plots
 
 function estimate_coef(x:: Vector{Float64}, y :: Vector{Float64})
