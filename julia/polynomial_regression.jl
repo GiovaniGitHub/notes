@@ -43,16 +43,16 @@ function estimate_coef(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epo
     n_rows, n_cols = size(X)
 
     w = zeros(n_cols,1)
-    b = zeros(n_rows,1)
+    b = 0
 
     losses = []
     for _ in 1:epochs
-        y_hat = X * w + b
+        y_hat = X*w + ones(n_rows)*b
         dw, db = gradient_descendent(X, y, y_hat)
         w -= learning_rate*dw
-        b -= learning_rate*ones(length(y))*db
+        b -= learning_rate*db
         
-        error = mse(y, X * w + b)
+        error = mse(y, X * w + ones(n_rows)*b)
         append!(losses, error)
     end
 
@@ -66,7 +66,7 @@ function estimate_coef_with_batch(x::Vector{Float64}, y::Vector{Float64}, bs::In
     n_rows, n_cols = size(X)
 
     w = zeros(n_cols,1)
-    b = zeros(n_rows,1)
+    b = 0
 
     losses = []
     for _ in 1:epochs
@@ -74,14 +74,14 @@ function estimate_coef_with_batch(x::Vector{Float64}, y::Vector{Float64}, bs::In
             Xb = X[i:min(i + bs - 1, end),:]
             yb = y[i:min(i + bs - 1, end)]
             
-            y_hat = Xb * w + b[i:min(i + bs - 1, end),:]
+            y_hat = Xb * w + ones(size(Xb,1)) * b
 
             dw, db = gradient_descendent(Xb, yb, y_hat)
 
             w -= learning_rate*dw
-            b -= learning_rate*ones(length(b))*db
+            b -= learning_rate*db
             
-            error = mse(y, X * w + b)
+            error = mse(y, X * w + ones(size(X,1))*b)
             append!(losses, error)
         end
     end
@@ -97,14 +97,29 @@ function main()
     y = df.y
     x = df.x
 
-    w, b, losses = estimate_coef_with_batch(x, y, 100, 12, 1000, 0.01)
+    x_train = Vector{Float64}([])
+    x_test = Vector{Float64}([])
+    y_train = Vector{Float64}([])
+    y_test = Vector{Float64}([])
+    for i in 1:length(x)
+        if i % 6 != 0
+            append!(x_train,Float64(x[i]))
+            append!(y_train,Float64(y[i]))
+        else
+            append!(x_test,Float64(x[i]))
+            append!(y_test,Float64(y[i]))            
+        end
 
-    X = expand_matrix(x, 12)
-    y_hat = X * w + b
-    yy = [y,y_hat]
+    end
+
+    w, b, losses = estimate_coef_with_batch(x_train, y_train, 10, 14, 2000, 0.01)
+
+    X_test = expand_matrix(x_test, 14)
+    y_hat = X_test * w + ones(size(X_test,1))*b
+    yy = [y_test, y_hat]
     r = sum(losses)/length(losses)
 
-    pp = plot(x, yy, title = "Polynomial Linear Regression: \n $r",seriestype = :scatter,
+    pp = plot(x_test, yy, title = "Polynomial Linear Regression: \n $r",seriestype = :scatter,
                 label = ["Original" "Predicted"], lw = 2)
                 
     savefig(pp, "polynomial_linear_regression.png")
