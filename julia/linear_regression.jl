@@ -24,7 +24,6 @@ end
 function main()
     PATH_FILE = "../dataset/linear_regression.csv"
     df = DataFrame(CSV.File(PATH_FILE))
-    n_rows, n_cols = size(df)
     
     y = df.MEDV
     X = Matrix(select!(df, Not(:MEDV)))
