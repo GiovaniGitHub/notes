@@ -60,6 +60,35 @@ function estimate_coef(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epo
 
 end
 
+function estimate_coef_with_batch(x::Vector{Float64}, y::Vector{Float64}, bs::Int, degrees::Int, epochs::Int,
+                                  learning_rate::Float64)
+    X = expand_matrix(x, degrees)
+    n_rows, n_cols = size(X)
+
+    w = zeros(n_cols,1)
+    b = zeros(n_rows,1)
+
+    losses = []
+    for _ in 1:epochs
+        for i in 1:bs:n_rows
+            Xb = X[i:min(i + bs - 1, end),:]
+            yb = y[i:min(i + bs - 1, end)]
+            
+            y_hat = Xb * w + b[i:min(i + bs - 1, end),:]
+
+            dw, db = gradient_descendent(Xb, yb, y_hat)
+
+            w -= learning_rate*dw
+            b -= learning_rate*ones(length(b))*db
+            
+            error = mse(y, X * w + b)
+            append!(losses, error)
+        end
+    end
+
+    return w, b, losses
+
+end
 
 function main()
     PATH_FILE = "../dataset/polynomial_regression_data.csv"
@@ -68,7 +97,7 @@ function main()
     y = df.y
     x = df.x
 
-    w, b, losses = estimate_coef(x, y, 12, 5000, 0.01)
+    w, b, losses = estimate_coef_with_batch(x, y, 100, 12, 1000, 0.01)
 
     X = expand_matrix(x, 12)
     y_hat = X * w + b
