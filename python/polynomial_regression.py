@@ -23,9 +23,8 @@ def mse(y, y_hat):
 def gradient_descendent(x, y, y_hat):
     n_rows,_ = x.shape
     dw = (1/n_rows)*dot(x.T, (y_hat - y))
-    db = (1/n_rows)*sum((y_hat - y)) 
     
-    return dw, db
+    return dw
 
 
 def estimate_coef(x,y, degrees, epochs, lr):
@@ -34,19 +33,17 @@ def estimate_coef(x,y, degrees, epochs, lr):
     _, n_cols = X.shape
     
     w = zeros((n_cols,1))
-    b = 0
     
     losses = []
     for _ in range(epochs):
-        y_hat = dot(X, w) + b
-        dw, db = gradient_descendent(X, y, y_hat)
+        y_hat = dot(X, w)
+        dw = gradient_descendent(X, y, y_hat)
         w -= lr*dw
-        b -= lr*db
 
-        error = mse(y, dot(X, w) + b)
+        error = mse(y, dot(X, w))
         losses.append(error)
 
-    return w, b, losses
+    return w, losses
 
 
 def estimate_coef_with_batch(x, y, bs, degrees, epochs, lr):
@@ -55,7 +52,6 @@ def estimate_coef_with_batch(x, y, bs, degrees, epochs, lr):
     n_rows, n_cols = X.shape
     
     w = zeros((n_cols,1))
-    b = 0
     
     losses = []
     
@@ -66,17 +62,16 @@ def estimate_coef_with_batch(x, y, bs, degrees, epochs, lr):
             end_i = start_i + bs
             Xb = X[start_i:end_i]
             yb = y[start_i:end_i,:]
-            y_hat = dot(Xb, w) + b
+            y_hat = dot(Xb, w)
             
-            dw, db = gradient_descendent(Xb, yb, y_hat)
+            dw = gradient_descendent(Xb, yb, y_hat)
             
             w -= lr*dw
-            b -= lr*db
         
-        error = mse(y, dot(X, w) + b)
+        error = mse(y, dot(X, w))
         losses.append(error)
         
-    return w, b, losses
+    return w, losses
 
 
 if __name__ == "__main__":
@@ -88,10 +83,10 @@ if __name__ == "__main__":
     y = df.y.values
     y = y.reshape(len(y),1)
 
-    weights, bias, losses = estimate_coef(X, y, degrees=12, epochs=6000, lr=0.01)
+    weights, losses = estimate_coef_with_batch(X, y, 100, degrees=12, epochs=6000, lr=0.01)
     
     X_expanded = expand_matrix(X, 12)
-    y_hat = dot(X_expanded, weights) + bias
+    y_hat = dot(X_expanded, weights)
     
     loss = mse(y, y_hat)
     
