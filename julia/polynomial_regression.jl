@@ -9,6 +9,30 @@
 using DataFrames
 using CSV
 using Plots
+using Random
+
+function split_dataset(X::Vector{Float64}, y:: Vector{Float64}, percent::Float64)
+    rng = MersenneTwister(1234);
+    indexs = shuffle!(rng, Vector(1:length(y)))
+
+    X_train = Vector{Float64}([])
+    X_test = Vector{Float64}([])
+    y_train = Vector{Float64}([])
+    y_test = Vector{Float64}([])
+
+    for i in 1:length(indexs)
+        if i < percent*length(indexs)
+            append!(X_train,Float64(X[indexs[i]]))
+            append!(y_train,Float64(y[indexs[i]]))
+        else
+            append!(X_test,Float64(X[indexs[i]]))
+            append!(y_test,Float64(y[indexs[i]]))            
+        end
+
+    end
+
+    return X_train, y_train, X_test, y_test
+end
 
 
 function mse(y::Vector{Float64}, y_hat::Matrix{Float64})
@@ -95,22 +119,9 @@ function main()
     df = DataFrame(CSV.File(PATH_FILE))
 
     y = df.y
-    x = df.x
+    X = df.x
 
-    x_train = Vector{Float64}([])
-    x_test = Vector{Float64}([])
-    y_train = Vector{Float64}([])
-    y_test = Vector{Float64}([])
-    for i in 1:length(x)
-        if i % 6 != 0
-            append!(x_train,Float64(x[i]))
-            append!(y_train,Float64(y[i]))
-        else
-            append!(x_test,Float64(x[i]))
-            append!(y_test,Float64(y[i]))            
-        end
-
-    end
+    x_train, y_train, x_test, y_test = split_dataset(X, y, 0.7)
 
     w, b, losses = estimate_coef_with_batch(x_train, y_train, 10, 14, 2000, 0.01)
 
