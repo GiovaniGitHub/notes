@@ -11,7 +11,7 @@ def estimate_coef(X,y):
     return theta
 
 if __name__ == "__main__":
-    df = pd.read_csv('../dataset/linear_regression2.csv')
+    df = pd.read_csv('../dataset/linear_regression.csv')
     y = df.z.values
     X = df[df.columns.drop('z')].values
     
