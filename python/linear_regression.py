@@ -1,26 +1,23 @@
 import pandas as pd 
 from numpy.linalg import inv
-from numpy import dot, append, mean
-
-def mse(y, y_hat):
-    loss = mean((y_hat - y)**2)
-    return loss
+from numpy import dot, append
+from utils import mse
 
 def estimate_coef(X,y):
     n_rows, _ = X.shape
     X = append(X, [[1]]*n_rows, axis=1)
-    beta = dot(inv(dot(X.T, X)), dot(X.T, y))
+    theta = dot(inv(dot(X.T, X)), dot(X.T, y))
 
-    return beta[:-1], beta[-1]
-    
+    return theta
 
 if __name__ == "__main__":
-    df = pd.read_csv('../dataset/linear_regression.csv')
-    y = df.MEDV.values
-    X = df[df.columns.drop('MEDV')].values
+    df = pd.read_csv('../dataset/linear_regression2.csv')
+    y = df.z.values
+    X = df[df.columns.drop('z')].values
     
-    b_0, b_1 = estimate_coef(X, y)
-    y_hat = dot(X, b_0) + b_1
+    theta = estimate_coef(X, y)
+    X = append(X, [[1]]*X.shape[0], axis=1)
+    y_hat = dot(X, theta)
     
     loss = mse(y, y_hat)
     

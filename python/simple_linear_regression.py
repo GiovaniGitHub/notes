@@ -34,5 +34,6 @@ if __name__ == "__main__":
     
     plt.scatter(x, y, c='k', label='Original')
     plt.scatter(x, y_hat, c='g', label= 'Predicted')
+    plt.title(f"y = {round(b_1,3)}x + {round(b_0,3)}")
     plt.legend()
     plt.show()

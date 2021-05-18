@@ -1,5 +1,6 @@
 using Random
 
+
 function split_dataset(X::Vector{Float64}, y:: Vector{Float64}, percent::Float64)
     rng = MersenneTwister(1234);
     indexs = shuffle!(rng, Vector(1:length(y)))
@@ -10,7 +11,7 @@ function split_dataset(X::Vector{Float64}, y:: Vector{Float64}, percent::Float64
     y_test = Vector{Float64}([])
 
     for i in 1:length(indexs)
-        if i < percent*length(indexs)
+        if i <= percent*length(indexs)
             append!(X_train,Float64(X[indexs[i]]))
             append!(y_train,Float64(y[indexs[i]]))
         else
@@ -23,6 +24,7 @@ function split_dataset(X::Vector{Float64}, y:: Vector{Float64}, percent::Float64
     return X_train, y_train, X_test, y_test
 end
 
+
 function gradient_descendent(X::Matrix{Float64}, y::Vector{Float64}, y_hat:: Matrix{Float64})
     n_rows = size(X,1)
 
@@ -31,6 +33,7 @@ function gradient_descendent(X::Matrix{Float64}, y::Vector{Float64}, y_hat:: Mat
 
     return dw, db
 end
+
 
 function mse(y::Vector{Float64}, y_hat::Matrix{Float64})
     return sum((y_hat - y).^2)/length(y)
