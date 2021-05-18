@@ -22,7 +22,7 @@ end
 
 
 function main()
-    PATH_FILE = "../dataset/linear_regression2.csv"
+    PATH_FILE = "../dataset/linear_regression.csv"
     df = DataFrame(CSV.File(PATH_FILE))
     
     y = df.z
@@ -34,8 +34,6 @@ function main()
     X = hcat(X, ones(n_rows))
 
     y_hat = X * theta
-
-    yy = [y,y_hat]
 
     r = 1 - (sum(y) - n_rows*mean(y)) / mean((y .- y_hat).^2)
 
