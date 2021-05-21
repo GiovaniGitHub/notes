@@ -1,6 +1,6 @@
-from gradients import gradient_descendent_mse
+from gradients import gradient_huber
 import pandas as pd 
-from numpy import dot, sum, mean, zeros, array, insert, ones
+from numpy import dot, mean, zeros, array
 from numpy.linalg import inv
 
 
@@ -15,14 +15,6 @@ def expand_matrix(x, max_coef, min_coef = 0):
 def mse(y, y_hat):
     loss = mean((y_hat - y)**2)
     return loss
-
-
-def gradient_descendent(x, y, y_hat):
-    n_rows,_ = x.shape
-    dw = (1/n_rows)*dot(x.T, (y_hat - y))
-    db = (1/n_rows)*sum(y_hat - y)
-
-    return dw, db
 
 
 def estimate_coef(X, y, degrees):
@@ -44,7 +36,7 @@ def estimate_coef_with_gradient(x,y, degrees, epochs, lr):
     b = 0
     for _ in range(epochs):
         y_hat = dot(X, w) + b
-        dw, db = gradient_descendent_mse(X, y, y_hat)
+        dw, db = gradient_huber(X, y, y_hat)
         w -= lr*dw
         b -= lr*db
 
@@ -72,7 +64,7 @@ def estimate_coef_with_grandient_and_batch(x, y, bs, degrees, epochs, lr):
             yb = y[start_i:end_i,:]
             y_hat = dot(Xb, w)
             
-            dw,db = gradient_descendent_mse(Xb, yb, y_hat)
+            dw,db = gradient_huber(Xb, yb, y_hat)
             
             w -= lr*dw
             b -= lr*db
@@ -93,7 +85,7 @@ if __name__ == "__main__":
 
     weights = estimate_coef(X, y, degrees=13)
     weights_gradients, linear_coef_gradients, losses = estimate_coef_with_gradient(X, y, 13, 10000, lr=0.01)
-    weights_gradients_batch, linear_coef_gradients_batch, losses = estimate_coef_with_grandient_and_batch(X, y, 50, 13, 10000, lr=0.01)
+    weights_gradients_batch, linear_coef_gradients_batch, losses = estimate_coef_with_grandient_and_batch(X, y, 50, 13, 2000, lr=0.01)
     
     y_hat = dot(expand_matrix(X, 13, 0), weights)
     y_hat_gradient = dot(expand_matrix(X, 13, 1), weights_gradients) + linear_coef_gradients
