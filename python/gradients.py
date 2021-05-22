@@ -60,7 +60,14 @@ def adjust_weights_with_batch(X, y, w, b, epochs, batch, losses, lr, func_adjust
     return w, b, losses
 
 
-def adjust_weights(X, y, w, b, epochs, losses, lr, func_adjust):
+def adjust_weights(X, y, w, b, epochs, losses, lr, func_adjust, is_stochastic=False):
+    if is_stochastic:
+        n_rows, _ = X.shape
+        idx = list(range(0,n_rows))
+        idx = random.permutation(idx)
+        X = X[idx,:]
+        y = y[idx,:]
+        
     for _ in range(epochs):
         y_hat = dot(X, w) + b
         dw, db = func_adjust(X, y, y_hat)
