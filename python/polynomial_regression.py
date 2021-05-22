@@ -1,20 +1,17 @@
-from gradients import gradient_huber
+from utils import mse
+from gradients import adjust_weights, adjust_weights_with_batch, update_weights_mse, update_weights_mae, \
+update_weights_huber
 import pandas as pd 
-from numpy import dot, mean, zeros, array
+from numpy import dot, zeros, array, random
 from numpy.linalg import inv
 
 
 def expand_matrix(x, max_coef, min_coef = 0):
     result = []
     for v in x:
-        result.append([v**i for i in range(min_coef, max_coef+1)])
+        result.append([v**i for i in range(min_coef, max_coef)])
     
     return array(result)
-
-
-def mse(y, y_hat):
-    loss = mean((y_hat - y)**2)
-    return loss
 
 
 def estimate_coef(X, y, degrees):
@@ -25,53 +22,28 @@ def estimate_coef(X, y, degrees):
     return beta
 
 
-def estimate_coef_with_gradient(x,y, degrees, epochs, lr):
+def get_coef_with_gradient(x,y, degrees, epochs, lr, func_adjust):
     X = expand_matrix(x, degrees, 1)
-    
     _, n_cols = X.shape
-    
     w = zeros((n_cols,1))
-    
     losses = []
     b = 0
-    for _ in range(epochs):
-        y_hat = dot(X, w) + b
-        dw, db = gradient_huber(X, y, y_hat)
-        w -= lr*dw
-        b -= lr*db
-
-        error = mse(y, dot(X, w) + b)
-        losses.append(error)
+    
+    w, b, losses = adjust_weights(X, y, w, b, epochs, losses, lr, func_adjust=func_adjust)
 
     return w, b, losses
 
 
-def estimate_coef_with_grandient_and_batch(x, y, bs, degrees, epochs, lr):
+def get_coef_with_grandient_and_batch(x, y, batch, degrees, epochs, lr, func_adjust, is_stochastic=False):
     X = expand_matrix(x, degrees, 1)
-    
-    n_rows, n_cols = X.shape
-    
+    _, n_cols = X.shape
     w = zeros((n_cols,1))
-    
     losses = []
     b = 0
-    for _ in range(epochs):
-        for i in range((n_rows-1)//bs + 1):
-            
-            start_i = i*bs
-            end_i = start_i + bs
-            Xb = X[start_i:end_i,:]
-            yb = y[start_i:end_i,:]
-            y_hat = dot(Xb, w)
-            
-            dw,db = gradient_huber(Xb, yb, y_hat)
-            
-            w -= lr*dw
-            b -= lr*db
-        error = mse(y, dot(X, w))
-        losses.append(error)
-        
-    return w, db,losses
+
+    w, b, losses = adjust_weights_with_batch(X, y, w, b, epochs, batch, losses, lr, func_adjust, is_stochastic)
+    
+    return w, b, losses
 
 
 if __name__ == "__main__":
@@ -84,12 +56,14 @@ if __name__ == "__main__":
     y = y.reshape(len(y),1)
 
     weights = estimate_coef(X, y, degrees=13)
-    weights_gradients, linear_coef_gradients, losses = estimate_coef_with_gradient(X, y, 13, 10000, lr=0.01)
-    weights_gradients_batch, linear_coef_gradients_batch, losses = estimate_coef_with_grandient_and_batch(X, y, 50, 13, 2000, lr=0.01)
+    weights_gd, linear_coef_gd, losses = get_coef_with_gradient(X, y, 13, 10000, lr=0.01, 
+                                                                func_adjust=update_weights_mae)
+    weights_gd_batch, linear_coef_bd_batch, losses = get_coef_with_grandient_and_batch(X, y, 10, 13, 1000, lr=0.01,
+                                                                                       func_adjust=update_weights_mae)
     
     y_hat = dot(expand_matrix(X, 13, 0), weights)
-    y_hat_gradient = dot(expand_matrix(X, 13, 1), weights_gradients) + linear_coef_gradients
-    y_hat_gradient_batch = dot(expand_matrix(X, 13, 1), weights_gradients_batch) + linear_coef_gradients_batch
+    y_hat_gradient = dot(expand_matrix(X, 13, 1), weights_gd) + linear_coef_gd
+    y_hat_gradient_batch = dot(expand_matrix(X, 13, 1), weights_gd_batch) + linear_coef_bd_batch
     
     
     from matplotlib import pyplot as plt
