@@ -10,7 +10,6 @@ import (
 	"github.com/montanaflynn/stats"
 	"gonum.org/v1/gonum/mat"
 	"gonum.org/v1/plot"
-	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 )
@@ -58,20 +57,11 @@ func main() {
 
 	p.Title.Text = fmt.Sprint("Simple Linear Regression \t r2 = ", r)
 
-	err = plotutil.AddScatters(p,
+	plotutil.AddScatters(p,
 		"Original", generatePoints(income, happiness),
 		"Predicted", generatePoints(income, y_hat))
 
 	if err := p.Save(4*vg.Inch, 4*vg.Inch, "points.png"); err != nil {
 		panic(err)
 	}
-}
-
-func generatePoints(x []float64, y []float64) plotter.XYs {
-	pts := make(plotter.XYs, len(y))
-	for i := range pts {
-		pts[i].X = x[i]
-		pts[i].Y = y[i]
-	}
-	return pts
 }
