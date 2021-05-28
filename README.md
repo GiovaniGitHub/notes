@@ -3,6 +3,7 @@
 # Languages
 * Julia
 * Python
+* Go
 
 # Algorithms
 * Linear Regression
