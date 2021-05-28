@@ -55,7 +55,7 @@ func main() {
 
 	p := plot.New()
 
-	p.Title.Text = fmt.Sprint("Simple Linear Regression \t r2 = ", r)
+	p.Title.Text = fmt.Sprint("Simple Linear Regression \n r2 = ", r)
 
 	plotutil.AddScatters(p,
 		"Original", generatePoints(income, happiness),
