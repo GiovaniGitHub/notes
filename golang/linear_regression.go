@@ -8,7 +8,26 @@ import (
 	"strconv"
 
 	"gonum.org/v1/gonum/mat"
+	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotutil"
+	"gonum.org/v1/plot/vg"
 )
+
+func predictDataset(coefs map[int]float64, M mat.Matrix) []float64 {
+	y_hat := []float64{}
+	n_rows, n_cols := M.Dims()
+	for i := 0; i < n_rows; i++ {
+		p := 0.0
+		for j := 0; j < n_cols; j++ {
+
+			p = p + coefs[j]*M.At(i, j)
+		}
+
+		y_hat = append(y_hat, p)
+	}
+
+	return y_hat
+}
 
 func coef_estimate(X_dense, y_dense mat.Matrix, n_cols int) map[int]float64 {
 	qr := new(mat.QR)
@@ -38,6 +57,7 @@ func coef_estimate(X_dense, y_dense mat.Matrix, n_cols int) map[int]float64 {
 
 	return coeff
 }
+
 func main() {
 	csvfile, err := os.Open("../dataset/linear_regression.csv")
 	if err != nil {
@@ -66,5 +86,22 @@ func main() {
 		}
 	}
 	coeff := coef_estimate(X_dense, y_dense, n_cols)
-	fmt.Println(coeff)
+	y_hat := predictDataset(coeff, X_dense)
+
+	idx := []float64{}
+	for i := 0; i < len(y_hat); i++ {
+		idx = append(idx, float64(i*2))
+	}
+
+	p := plot.New()
+
+	p.Title.Text = fmt.Sprint("Linear Regression \n r2 = ", 1)
+
+	plotutil.AddLines(p,
+		"Predicted", generatePoints(idx, y_hat),
+		"Original", generatePoints(idx, y_dense.RawMatrix().Data))
+
+	if err := p.Save(4*vg.Inch, 4*vg.Inch, "linear_regression_golang.png"); err != nil {
+		panic(err)
+	}
 }
