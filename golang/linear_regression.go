@@ -95,7 +95,7 @@ func main() {
 
 	p := plot.New()
 
-	p.Title.Text = fmt.Sprint("Linear Regression \n r2 = ", 1)
+	p.Title.Text = fmt.Sprint("Linear Regression \n R2 = ", r2(y_hat, y_dense.RawMatrix().Data))
 
 	plotutil.AddLines(p,
 		"Predicted", generatePoints(idx, y_hat),
