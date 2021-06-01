@@ -3,13 +3,11 @@ module golang
 go 1.15
 
 require (
+	github.com/ajstarks/svgo v0.0.0-20210406150507-75cfd577ce75 // indirect
 	github.com/go-gota/gota v0.10.1
-	github.com/gonum/blas v0.0.0-20181208220705-f22b278b28ac // indirect
-	github.com/gonum/floats v0.0.0-20181209220543-c233463c7e82
-	github.com/gonum/internal v0.0.0-20181124074243-f884aa714029 // indirect
-	github.com/gonum/lapack v0.0.0-20181123203213-e4cdc5a0bff9 // indirect
-	github.com/gonum/matrix v0.0.0-20181209220409-c518dec07be9
 	github.com/montanaflynn/stats v0.6.6
+	golang.org/x/image v0.0.0-20210504121937-7319ad40d33e // indirect
+	golang.org/x/text v0.3.6 // indirect
 	gonum.org/v1/gonum v0.9.1
 	gonum.org/v1/plot v0.9.0
 )
