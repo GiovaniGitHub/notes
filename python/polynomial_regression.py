@@ -9,7 +9,7 @@ from numpy.linalg import inv
 def expand_matrix(x, max_coef, min_coef = 0):
     result = []
     for v in x:
-        result.append([v**i for i in range(min_coef, max_coef)])
+        result.append([v**i for i in range(min_coef, max_coef+1)])
     
     return array(result)
 
@@ -33,7 +33,7 @@ def get_coef_with_gradient(x,y, degrees, epochs, lr, func_adjust, batch = None, 
         w, b, losses = adjust_weights_with_batch(X, y, w, b, epochs, batch, losses, lr, func_adjust, is_stochastic)
     else:
         w, b, losses = adjust_weights(X, y, w, b, epochs, losses, lr, func_adjust, is_stochastic)
-        
+    
     return w, b, losses
 
 
@@ -49,9 +49,9 @@ if __name__ == "__main__":
 
     weights = estimate_coef(X, y, degrees=5)
     weights_gd, linear_coef_gd, losses = get_coef_with_gradient(X, y, 5, 1000, lr=0.01, 
-                                                                func_adjust=update_weights_huber)
+                                                                func_adjust=update_weights_mae)
     
-    weights_gd_batch, linear_coef_bd_batch, losses = get_coef_with_gradient(X, y, 5, 100, lr=0.01, 
+    weights_gd_batch, linear_coef_bd_batch, losses = get_coef_with_gradient(X, y, 5, 200, lr=0.01, 
                                                             batch = 10, func_adjust=update_weights_huber)
 
     y_hat = dot(expand_matrix(X, 5, 0), weights)
