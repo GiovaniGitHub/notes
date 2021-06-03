@@ -58,8 +58,8 @@ func main() {
 	p.Title.Text = fmt.Sprint("Simple Linear Regression \n r2 = ", r)
 
 	plotutil.AddScatters(p,
-		"Original", generatePoints(income, happiness),
-		"Predicted", generatePoints(income, y_hat))
+		"Original", GeneratePoints(income, happiness),
+		"Predicted", GeneratePoints(income, y_hat))
 
 	if err := p.Save(4*vg.Inch, 4*vg.Inch, "points.png"); err != nil {
 		panic(err)

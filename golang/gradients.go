@@ -1,8 +1,65 @@
 package main
 
 import (
+	"math"
+
 	"gonum.org/v1/gonum/mat"
 )
+
+func Sum(v []float64) float64 {
+	resp := 0.0
+	for i := 0; i < len(v); i++ {
+		resp += v[i]
+	}
+
+	return resp
+}
+
+func SumAbs(v []float64) float64 {
+	resp := 0.0
+	for i := 0; i < len(v); i++ {
+		resp += math.Abs(v[i])
+	}
+
+	return resp
+}
+
+func UpdateWeightsMAE(x mat.Matrix, y mat.Matrix, y_hat mat.Matrix) ([]float64, float64) {
+	n_rows, n_cols := x.Dims()
+
+	dw := []float64{}
+
+	for j := 0; j < n_cols; j++ {
+		dw = append(dw, 0)
+	}
+
+	diff := []float64{}
+	for j := 0; j < n_cols; j++ {
+		temp := 0.0
+		for i := 0; i < n_rows; i++ {
+			err_value := y_hat.At(i, 0) - y.At(i, 0)
+			temp += x.At(i, j) * err_value
+		}
+		diff = append(diff, temp)
+	}
+
+	for j := 0; j < n_cols; j++ {
+		for i := 0; i < n_rows; i++ {
+			err_value := y_hat.At(i, 0) - y.At(i, 0)
+			dw[j] += x.At(i, j) * err_value
+		}
+		dw[j] = (1.0 / SumAbs(diff)) * diff[j]
+	}
+
+	err_vector := []float64{}
+	for i := 0; i < n_rows; i++ {
+		err_vector = append(err_vector, y_hat.At(i, 0)-y.At(i, 0))
+	}
+
+	db := (1.0 / SumAbs(diff)) * Sum(err_vector)
+
+	return dw, db
+}
 
 func UpdateWeightsMSE(x mat.Matrix, y mat.Matrix, y_hat mat.Matrix) ([]float64, float64) {
 	n_rows, n_cols := x.Dims()

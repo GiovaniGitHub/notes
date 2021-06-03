@@ -13,7 +13,7 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
-func predictDataset(coefs map[int]float64, M mat.Matrix) []float64 {
+func ClassifierDataset(coefs map[int]float64, M mat.Matrix) []float64 {
 	y_hat := []float64{}
 	n_rows, n_cols := M.Dims()
 	for i := 0; i < n_rows; i++ {
@@ -29,15 +29,20 @@ func predictDataset(coefs map[int]float64, M mat.Matrix) []float64 {
 	return y_hat
 }
 
-func coef_estimate(X_dense, y_dense mat.Matrix, n_cols int) map[int]float64 {
+func CoefEstimate(X_dense, y_dense mat.Matrix, n_cols int) map[int]float64 {
 	qr := new(mat.QR)
+
 	qr.Factorize(X_dense)
+
 	q := new(mat.Dense)
+
 	reg := new(mat.Dense)
+
 	qr.QTo(q)
 	qr.RTo(reg)
 
 	qtr := q.T()
+
 	qty := new(mat.Dense)
 	qty.Mul(qtr, y_dense)
 
@@ -85,8 +90,8 @@ func main() {
 			}
 		}
 	}
-	coeff := coef_estimate(X_dense, y_dense, n_cols)
-	y_hat := predictDataset(coeff, X_dense)
+	coeff := CoefEstimate(X_dense, y_dense, n_cols)
+	y_hat := ClassifierDataset(coeff, X_dense)
 
 	idx := []float64{}
 	for i := 0; i < len(y_hat); i++ {
@@ -98,8 +103,8 @@ func main() {
 	p.Title.Text = fmt.Sprint("Linear Regression \n R2 = ", r2(y_hat, y_dense.RawMatrix().Data))
 
 	plotutil.AddLines(p,
-		"Predicted", generatePoints(idx, y_hat),
-		"Original", generatePoints(idx, y_dense.RawMatrix().Data))
+		"Predicted", GeneratePoints(idx, y_hat),
+		"Original", GeneratePoints(idx, y_dense.RawMatrix().Data))
 
 	if err := p.Save(4*vg.Inch, 4*vg.Inch, "linear_regression_golang.png"); err != nil {
 		panic(err)

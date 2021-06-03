@@ -24,7 +24,7 @@ func main() {
 		log.Fatal(err)
 	}
 	n_rows := len(lines)
-	n_cols := 8
+	n_cols := 7
 	y_dense := mat.NewDense(n_rows-1, 1, nil)
 	X_dense := mat.NewDense(n_rows-1, n_cols, nil)
 
@@ -40,14 +40,23 @@ func main() {
 	}
 
 	w := []float64{}
+	w2 := []float64{}
+
 	for i := 0; i < n_cols; i++ {
 		w = append(w, 0)
+		w2 = append(w2, 0)
 	}
+
 	losses := []float64{}
+
 	b := 0.0
-	w, b = AdjustWeight(X_dense, y_dense, w, b, 120, losses, 0.01, UpdateWeightsMSE, false)
+	b2 := 0.0
+
+	w, b = AdjustWeight(X_dense, y_dense, w, b, 1000, losses, 0.01, UpdateWeightsMSE, false)
+	w2, b2 = AdjustWeight(X_dense, y_dense, w2, b2, 1000, losses, 0.01, UpdateWeightsMAE, false)
 
 	y_hat := Predict(w, X_dense, b)
+	y_hat2 := Predict(w2, X_dense, b2)
 
 	idx := []float64{}
 	for i := 0; i < len(y_hat); i++ {
@@ -59,11 +68,12 @@ func main() {
 	p.Title.Text = fmt.Sprint("Poly Regression \n R2 = ", r2(y_hat, y_dense.RawMatrix().Data))
 
 	plotutil.AddLines(p,
-		"Original", generatePoints(idx, y_dense.RawMatrix().Data),
-		"Predicted", generatePoints(idx, y_hat),
+		"Original", GeneratePoints(idx, y_dense.RawMatrix().Data),
+		"Predicted MSE", GeneratePoints(idx, y_hat),
+		"Predicted MAE", GeneratePoints(idx, y_hat2),
 	)
 
-	if err := p.Save(4*vg.Inch, 4*vg.Inch, "polynomial_regression_golang.png"); err != nil {
+	if err := p.Save(7*vg.Inch, 7*vg.Inch, "polynomial_regression_golang.png"); err != nil {
 		panic(err)
 	}
 }
