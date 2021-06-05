@@ -2,6 +2,8 @@ package main
 
 import (
 	"math"
+	"math/rand"
+	"time"
 
 	"github.com/montanaflynn/stats"
 	"gonum.org/v1/gonum/mat"
@@ -60,4 +62,21 @@ func Predict(w []float64, M mat.Matrix, b float64) []float64 {
 	}
 
 	return y_hat
+}
+
+func RandomizeDataset(X, y mat.Matrix) (mat.Matrix, mat.Matrix) {
+	n_rows, n_cols := X.Dims()
+
+	rand.Seed(time.Now().UTC().UnixNano())
+	X_randomized := mat.NewDense(n_rows, n_cols, nil)
+	y_randomized := mat.NewDense(n_rows, 1, nil)
+
+	for i, value := range rand.Perm(n_rows) {
+		for j := 0; j < n_cols; j++ {
+			X_randomized.Set(i, j, X.At(value, j))
+		}
+		y_randomized.Set(i, 0, y.At(value, 0))
+	}
+
+	return X_randomized, y_randomized
 }

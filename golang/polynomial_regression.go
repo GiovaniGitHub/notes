@@ -37,7 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 	n_rows := len(lines)
-	n_cols := 7
+	n_cols := 5
 	y_dense := mat.NewDense(n_rows-1, 1, nil)
 	X_dense := mat.NewDense(n_rows-1, n_cols, nil)
 
@@ -70,9 +70,9 @@ func main() {
 	b2 := 0.0
 	b3 := 0.0
 
-	paramentersMSE := Parameters{X_dense, y_dense, w, b, 1000, losses, 0.01, "mse", false, 0}
+	paramentersMSE := Parameters{X_dense, y_dense, w, b, 100, losses, 0.01, "mse", false, 0}
 	paramentersMAE := Parameters{X_dense, y_dense, w2, b2, 1000, losses2, 0.01, "mae", false, 0}
-	paramentersHuber := Parameters{X_dense, y_dense, w3, b3, 1000, losses3, 0.01, "huber", false, 0.5}
+	paramentersHuber := Parameters{X_dense, y_dense, w3, b3, 1000, losses3, 0.01, "huber", false, 0.3}
 
 	w, b = AdjustWeight(paramentersMSE)
 	w2, b2 = AdjustWeight(paramentersMAE)
@@ -89,13 +89,13 @@ func main() {
 
 	p := plot.New()
 
-	p.Title.Text = fmt.Sprint("Poly Regression \n R2 = ", r2(y_hat, y_dense.RawMatrix().Data))
+	p.Title.Text = "Poly Regression"
 
 	plotutil.AddLines(p,
 		"Original", GeneratePoints(idx, y_dense.RawMatrix().Data),
-		"Predicted MSE", GeneratePoints(idx, y_hat),
-		"Predicted MAE", GeneratePoints(idx, y_hat2),
-		"Predicted Huber", GeneratePoints(idx, y_hat3),
+		fmt.Sprintf("MSE %.3f", r2(y_hat, y_dense.RawMatrix().Data)), GeneratePoints(idx, y_hat),
+		fmt.Sprintf("MAE %.3f", r2(y_hat2, y_dense.RawMatrix().Data)), GeneratePoints(idx, y_hat2),
+		fmt.Sprintf("Huber %.3f", r2(y_hat3, y_dense.RawMatrix().Data)), GeneratePoints(idx, y_hat3),
 	)
 
 	if err := p.Save(7*vg.Inch, 7*vg.Inch, "polynomial_regression_golang.png"); err != nil {

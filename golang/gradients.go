@@ -83,21 +83,11 @@ func UpdateWeightsHuber(x mat.Matrix, y mat.Matrix, y_hat mat.Matrix, delta floa
 	return dw, db
 }
 
-// func AdjustWeight(X mat.Matrix, y mat.Matrix, w []float64, b float64, epochs int, losses []float64, lr float64, func_adjust func(mat.Matrix, mat.Matrix, mat.Matrix) ([]float64, float64), is_stochastic bool, delta float64) ([]float64, float64) {
-
-// 	for i := 0; i < epochs; i++ {
-// 		y_hat := Predict(w, X, b)
-// 		y_hat_dense := mat.NewDense(len(y_hat), 1, y_hat)
-// 		dw, db := func_adjust(X, y, y_hat_dense)
-// 		for j := 0; j < len(dw); j++ {
-// 			w[j] -= dw[j] * lr
-// 		}
-// 		b -= lr * db
-// 	}
-// 	return w, b
-// }
-
 func AdjustWeight(p Parameters) ([]float64, float64) {
+
+	if p.is_stochastic {
+		p.X, p.y = RandomizeDataset(p.X, p.y)
+	}
 
 	for i := 0; i < p.epochs; i++ {
 		y_hat := Predict(p.w, p.X, p.b)
