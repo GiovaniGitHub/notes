@@ -35,7 +35,7 @@ func coef_estimate(x []float64, y []float64) (float64, float64, float64) {
 
 }
 
-func main() {
+func SimpleLinearRegression() {
 	csvfile, err := os.Open("../dataset/simple_regression.csv")
 	if err != nil {
 		log.Fatal(err)

@@ -14,20 +14,7 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
-type Parameters struct {
-	X             mat.Matrix
-	y             mat.Matrix
-	w             []float64
-	b             float64
-	epochs        int
-	losses        []float64
-	lr            float64
-	func_type     string
-	is_stochastic bool
-	delta         float64
-}
-
-func main() {
+func PolynomialRegression() {
 	csvfile, err := os.Open("../dataset/polynomial_regression_data.csv")
 	if err != nil {
 		log.Fatal(err)
@@ -42,11 +29,10 @@ func main() {
 	X_dense := mat.NewDense(n_rows-1, n_cols, nil)
 
 	for i := 1; i < n_rows; i++ {
-		value_x, _ := strconv.ParseFloat(lines[i][0], 64)
 		value_y, _ := strconv.ParseFloat(lines[i][1], 64)
 		y_dense.Set(i-1, 0, value_y)
 		for j := 0; j < n_cols; j++ {
-			value_x, _ = strconv.ParseFloat(lines[i][0], 64)
+			value_x, _ := strconv.ParseFloat(lines[i][0], 64)
 			value_x = math.Pow(value_x, float64(j+1))
 			X_dense.Set(i-1, j, value_x)
 		}

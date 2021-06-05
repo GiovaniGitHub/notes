@@ -10,6 +10,19 @@ import (
 	"gonum.org/v1/plot/plotter"
 )
 
+type Parameters struct {
+	X             mat.Matrix
+	y             mat.Matrix
+	w             []float64
+	b             float64
+	epochs        int
+	losses        []float64
+	lr            float64
+	func_type     string
+	is_stochastic bool
+	delta         float64
+}
+
 func GeneratePoints(x []float64, y []float64) plotter.XYs {
 	pts := make(plotter.XYs, len(y))
 	for i := range pts {

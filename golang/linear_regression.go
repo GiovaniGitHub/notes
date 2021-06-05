@@ -63,7 +63,7 @@ func CoefEstimate(X_dense, y_dense mat.Matrix, n_cols int) map[int]float64 {
 	return coeff
 }
 
-func main() {
+func LinearRegression() {
 	csvfile, err := os.Open("../dataset/linear_regression.csv")
 	if err != nil {
 		log.Fatal(err)
