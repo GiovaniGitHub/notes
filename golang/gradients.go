@@ -97,16 +97,15 @@ func AdjustWeight(p Parameters) ([]float64, float64) {
 		db := 0.0
 
 		switch func_type := p.func_type; func_type {
+
 		case "mse":
 			dw, db = UpdateWeightsMSE(p.X, p.y, y_hat_dense)
 		case "mae":
 			dw, db = UpdateWeightsMAE(p.X, p.y, y_hat_dense)
 		case "huber":
 			dw, db = UpdateWeightsHuber(p.X, p.y, y_hat_dense, p.delta)
-		default:
-			dw, db = UpdateWeightsMSE(p.X, p.y, y_hat_dense)
-		}
 
+		}
 		for j := 0; j < len(dw); j++ {
 			p.w[j] -= dw[j] * p.lr
 		}
