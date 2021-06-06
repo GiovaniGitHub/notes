@@ -93,3 +93,31 @@ func RandomizeDataset(X, y mat.Matrix) (mat.Matrix, mat.Matrix) {
 
 	return X_randomized, y_randomized
 }
+
+func SplitDataset(X mat.Matrix, y mat.Matrix, percent float64) (mat.Matrix, mat.Matrix, mat.Matrix, mat.Matrix) {
+	X, y = RandomizeDataset(X, y)
+	n_rows, n_cols := X.Dims()
+	qtd_training := int(percent * float64(n_rows))
+
+	y_train_dense := mat.NewDense(qtd_training, 1, nil)
+	X_train_dense := mat.NewDense(qtd_training, n_cols, nil)
+
+	y_test_dense := mat.NewDense(qtd_training, 1, nil)
+	X_test_dense := mat.NewDense(qtd_training, n_cols, nil)
+
+	for i := 0; i < n_rows; i++ {
+		if i <= qtd_training {
+			for j := 0; j < n_cols; j++ {
+				X_train_dense.Set(i, j, X.At(i, j))
+				y_train_dense.Set(i, 0, y.At(i, 0))
+			}
+		} else {
+			for j := 0; j < n_cols; j++ {
+				X_test_dense.Set(i, j, X.At(i, j))
+				y_test_dense.Set(i, 0, y.At(i, 0))
+			}
+		}
+	}
+
+	return X_train_dense, y_train_dense, X_test_dense, y_test_dense
+}
