@@ -4,6 +4,7 @@
 * Julia
 * Python
 * Go
+* Java
 
 # Algorithms
 * Linear Regression
