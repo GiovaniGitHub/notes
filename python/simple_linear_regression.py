@@ -1,5 +1,6 @@
-import pandas as pd 
+import pandas as pd
 from math import sqrt
+
 
 def estimate_coef(x, y):
     n = len(x)
@@ -10,10 +11,10 @@ def estimate_coef(x, y):
 
     b_1 = SS_xy / SS_xx
     b_0 = y.mean() - b_1*x.mean()
-    
+
     r = SS_xy/(sqrt(SS_xx*SS_yy))
 
-    return (b_0, b_1, r) 
+    return (b_0, b_1, r)
 
 
 if __name__ == "__main__":
@@ -23,14 +24,14 @@ if __name__ == "__main__":
     x = df.income.values
     y = df.happiness.values
 
-    b_0, b_1, residual = estimate_coef(x,y)
+    b_0, b_1, residual = estimate_coef(x, y)
 
     y_hat = b_1 * x + b_0
-    
+
     from matplotlib import pyplot as plt
-    
+
     plt.scatter(x, y, c='k', label='Original')
-    plt.scatter(x, y_hat, c='g', label= 'Predicted')
+    plt.scatter(x, y_hat, c='g', label='Predicted')
     plt.title(f"y = {round(b_1,3)}x + {round(b_0,3)}")
     plt.legend()
     plt.show()
