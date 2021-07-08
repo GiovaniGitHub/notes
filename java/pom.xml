@@ -63,15 +63,23 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-  
-    <!-- <dependency>
-      <groupId>com.github.fracpete</groupId>
-      <artifactId>mini-weka</artifactId>
-      <version>3.9.15750</version>
-    </dependency> -->
+
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>16</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-maven-plugin</artifactId>
+        <version>0.0.6</version>
+        <configuration>
+          <mainClass>com.main.App</mainClass>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
