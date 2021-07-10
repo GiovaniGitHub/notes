@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.apache.commons.math3.stat.descriptive.summary.Sum;
 
 public class SimpleLinearRegression {
     public SimpleLinearRegression(){}
@@ -49,20 +49,20 @@ public class SimpleLinearRegression {
 
     public static Map<String, Double> estimateCoef(double[] x, double[] y) {
         int n = y.length;
-        Mean mean = new Mean();
+        Sum sum = new Sum();
 
         RealVector yRealVector = MatrixUtils.createRealVector(y);
         RealVector xRealVector = MatrixUtils.createRealVector(x);
 
-        double meanY = mean.evaluate(y);
-        double meanX = mean.evaluate(x);
+        double sumY = sum.evaluate(y);
+        double sumX = sum.evaluate(x);
 
-        double xSS = xRealVector.dotProduct(xRealVector) - n * meanX * meanX;
-        double ySS = yRealVector.dotProduct(yRealVector) - n * meanY * meanY;
-        double xySS = xRealVector.dotProduct(yRealVector) - n * meanX * meanY;
+        double xSS = xRealVector.dotProduct(xRealVector) - (sumX * sumX)/n;
+        double ySS = yRealVector.dotProduct(yRealVector) - (sumY * sumY)/n;
+        double xySS = xRealVector.dotProduct(yRealVector) - (sumX * sumY)/n;
 
         double b1 = xySS / xSS;
-        double b0 = meanY - b1 * meanX;
+        double b0 = (sumY/n) - b1 * (sumX/n);
         double r = xySS / (Math.sqrt(xSS * ySS));
 
         Map<String, Double> resp = new HashMap<String, Double>();
