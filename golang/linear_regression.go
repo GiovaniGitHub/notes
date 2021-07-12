@@ -31,12 +31,10 @@ func ClassifierDataset(coefs map[int]float64, M mat.Matrix) []float64 {
 
 func CoefEstimate(X_dense, y_dense mat.Matrix, n_cols int) map[int]float64 {
 	qr := new(mat.QR)
+	q := new(mat.Dense)
+	reg := new(mat.Dense)
 
 	qr.Factorize(X_dense)
-
-	q := new(mat.Dense)
-
-	reg := new(mat.Dense)
 
 	qr.QTo(q)
 	qr.RTo(reg)

@@ -12,16 +12,16 @@ import javafx.stage.Stage;
 
 public class App extends Application {
 
-    private ScatterChart<Number, Number> createScatterChart(SimpleLinearRegression.Dataset dataset, double[] yHat){
+    private ScatterChart<Number, Number> createScatterChart(double[] y, double[] yHat){
         final ScatterChart<Number, Number> sc = new ScatterChart<>(new NumberAxis(), new NumberAxis());
         sc.setTitle("Simple Linear Regression");
         XYChart.Series series1 = new XYChart.Series();
         XYChart.Series series2 = new XYChart.Series();
         series1.setName("Original Data");
         series2.setName("Regression");
-        for (int i = 0; i < dataset.x.length; i++) {
-            series1.getData().add(new XYChart.Data(dataset.x[i], dataset.y[i]));
-            series2.getData().add(new XYChart.Data(dataset.x[i], yHat[i]));
+        for (int i = 0; i < y.length; i++) {
+            series1.getData().add(new XYChart.Data(i, y[i]));
+            series2.getData().add(new XYChart.Data(i, yHat[i]));
         }
     
         sc.getData().addAll(series1, series2);
@@ -31,11 +31,15 @@ public class App extends Application {
     }
     @Override
     public void start(Stage stage) throws Exception {
-        SimpleLinearRegression.Dataset dataset = SimpleLinearRegression.readDataset();
-        Map<String, Double> m = SimpleLinearRegression.estimateCoef(dataset.x, dataset.y);
-        double[] yHat = SimpleLinearRegression.predict(dataset, m);
+        LinearRegression.Dataset dataset = LinearRegression.readDataset(true);
+        double[] coefs = LinearRegression.estimateCoef(dataset.X, dataset.y, "");
+        double[] yHat = LinearRegression.predict(dataset, coefs);
 
-        Scene scene = new Scene(createScatterChart(dataset, yHat));
+        // SimpleLinearRegression.Dataset dataset = SimpleLinearRegression.readDataset();
+        // Map<String, Double> m = SimpleLinearRegression.estimateCoef(dataset.x, dataset.y);
+        // double[] yHat = SimpleLinearRegression.predict(dataset, m);
+
+        Scene scene = new Scene(createScatterChart(dataset.y, yHat));
         stage.setScene(scene);
         stage.show();
     }
