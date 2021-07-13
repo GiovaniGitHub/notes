@@ -27,9 +27,9 @@ public class SimpleLinearRegression {
         }
     }
 
-    public static Dataset readDataset() {
+    public static Dataset readDataset(String file) {
         Dataset dataset = new Dataset();
-        Path path = Paths.get("../dataset/simple_regression.csv");
+        Path path = Paths.get(file);
         try (Stream<String> lines = Files.lines(path)) {
             List<Object> rows = Arrays.asList(lines.toArray());
             dataset.initDataset(rows.size()-1);

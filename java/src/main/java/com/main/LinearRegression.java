@@ -26,9 +26,9 @@ public class LinearRegression{
             y = new double[nrows];
         }
     }
-    public static Dataset readDataset(boolean setBias) {
+    public static Dataset readDataset(String file, boolean setBias) {
         Dataset dataset = new Dataset();
-        Path path = Paths.get("../dataset/linear_regression.csv");
+        Path path = Paths.get(file);
         try (Stream<String> lines = Files.lines(path)) {
             List<Object> rows = Arrays.asList(lines.toArray());
             String s = String.valueOf(rows.get(0));
@@ -47,7 +47,7 @@ public class LinearRegression{
                 if(setBias){
                     dataset.X[i][ncols-1] = 1;
                 }
-                dataset.y[i] = Float.parseFloat(l.get(2));
+                dataset.y[i] = Float.parseFloat(l.get(l.size()-1));
             }
             
         } catch (IOException e) {
