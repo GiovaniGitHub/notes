@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
-
+import java.util.Arrays;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -60,16 +60,16 @@ public class App extends Application {
 
             case "poly":
                 PolynomialRegression.Dataset datasetPoly = PolynomialRegression.readDataset("../dataset/polynomial_regression_data.csv", 7);
-                coefs = PolynomialRegression.estimateCoef(datasetPoly.X, datasetPoly.y, "");
-                yHat = PolynomialRegression.predict(datasetPoly, coefs);
+                coefs = PolynomialRegression.estimateCoef(datasetPoly, datasetPoly.y, "");
+                yHat = PolynomialRegression.predict(datasetPoly.XwithBias, coefs);
                 yAxis = datasetPoly.y;
                 xAxis = new double[datasetPoly.X.length];
-                for(int i=0;i<yAxis.length;i++){
+                for(int i=0; i<yAxis.length; i++){
                     xAxis[i] = datasetPoly.X[i][datasetPoly.X[i].length-2];
                 }
                 break;
             default:
-                System.out.println("Please run argument simple|linear");
+                System.out.println("Please run argument simple|linear|poly");
                 break;
         }
 

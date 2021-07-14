@@ -18,10 +18,12 @@ import org.apache.commons.math3.linear.RealMatrix;
 public class PolynomialRegression {
     static class Dataset{
         double[][] X;
+        double[][] XwithBias;
         double[] y;
 
         public void initDataset(int nrows, int ncols){
             X = new double[nrows][ncols];
+            XwithBias = new double[nrows][ncols+1];
             y = new double[nrows];
         }
     }
@@ -31,15 +33,18 @@ public class PolynomialRegression {
         Path path = Paths.get(file);
         try (Stream<String> lines = Files.lines(path)) {
             List<Object> rows = Arrays.asList(lines.toArray());
-            dataset.initDataset(rows.size(), dimension);
+            dataset.initDataset(rows.size()-1, dimension-1);
             for(int i = 1; i<rows.size(); i++){
                 String s = String.valueOf(rows.get(i));
                 List<String> l = Arrays.asList(s.split(","));
-                for(int j=0;j<dimension;j++){
-                    dataset.X[i][j] = Math.pow(Float.parseFloat(l.get(0)),dimension-(j+1));
+
+                for(int j=1; j<dimension; j++){
+                    dataset.X[i-1][j-1] = Math.pow(Float.parseFloat(l.get(0)),dimension - j);
+                    dataset.XwithBias[i-1][j-1] = Math.pow(Float.parseFloat(l.get(0)),dimension - j);
                 }
 
-                dataset.y[i] = Float.parseFloat(l.get(l.size()-1));
+                dataset.XwithBias[i-1][dimension-1] = 1.0;
+                dataset.y[i-1] = Float.parseFloat(l.get(l.size()-1));
             }
             
         } catch (IOException e) {
@@ -49,8 +54,8 @@ public class PolynomialRegression {
             return dataset;
         }
 
-        public static double[] estimateCoef(double[][] X, double[] y, String type){
-            RealMatrix matrix = new Array2DRowRealMatrix(X, false);
+        public static double[] estimateCoef(Dataset dataset, double[] y, String type){
+            RealMatrix matrix = new Array2DRowRealMatrix(dataset.XwithBias, false);
             RealVector yMatrix = new ArrayRealVector(y, false);
             RealVector result;
             switch (type) {
@@ -65,12 +70,11 @@ public class PolynomialRegression {
             return result.toArray();  
         }
     
-        public static double[] predict(Dataset dataset, double[] coefs){
-            double[] yHat = new double[dataset.X.length];
-            for (int i = 0; i < dataset.X.length; i++) {
-                yHat[i] = coefs[coefs.length-1];
-                for(int j=0; j < coefs.length-1;j++){
-                    yHat[i]+=coefs[j]*dataset.X[i][j];
+        public static double[] predict(double[][] X, double[] coefs){
+            double[] yHat = new double[X.length];
+            for (int i = 0; i < X.length; i++) {
+                for(int j=0; j < X[0].length;j++){
+                    yHat[i]+=coefs[j]*X[i][j];
                 }
             }
             return yHat;
