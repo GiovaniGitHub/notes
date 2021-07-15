@@ -8,22 +8,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.xml.crypto.Data;
+
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
+import org.apache.commons.math3.stat.descriptive.summary.Sum;
 import org.apache.commons.math3.linear.QRDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 
 public class PolynomialRegression {
     static class Dataset{
         double[][] X;
-        double[][] XwithBias;
+        double[][] Xexpanded;
         double[] y;
 
         public void initDataset(int nrows, int ncols){
             X = new double[nrows][ncols];
-            XwithBias = new double[nrows][ncols+1];
+            Xexpanded = new double[nrows][ncols+1];
             y = new double[nrows];
         }
     }
@@ -40,10 +43,10 @@ public class PolynomialRegression {
 
                 for(int j=1; j<dimension; j++){
                     dataset.X[i-1][j-1] = Math.pow(Float.parseFloat(l.get(0)),dimension - j);
-                    dataset.XwithBias[i-1][j-1] = Math.pow(Float.parseFloat(l.get(0)),dimension - j);
+                    dataset.Xexpanded[i-1][j-1] = Math.pow(Float.parseFloat(l.get(0)),dimension - j);
                 }
 
-                dataset.XwithBias[i-1][dimension-1] = 1.0;
+                dataset.Xexpanded[i-1][dimension-1] = 1.0;
                 dataset.y[i-1] = Float.parseFloat(l.get(l.size()-1));
             }
             
@@ -52,32 +55,63 @@ public class PolynomialRegression {
         }
     
             return dataset;
-        }
+    }
 
-        public static double[] estimateCoef(Dataset dataset, double[] y, String type){
-            RealMatrix matrix = new Array2DRowRealMatrix(dataset.XwithBias, false);
-            RealVector yMatrix = new ArrayRealVector(y, false);
-            RealVector result;
-            switch (type) {
-                case "svc":
-                    result = (new SingularValueDecomposition(matrix)).getSolver().solve(yMatrix);
-                    break;
-            
-                default:
-                    result = (new QRDecomposition(matrix)).getSolver().solve(yMatrix);
-                    break;
-            }
-            return result.toArray();  
+    public static double[] estimateCoef(Dataset dataset, String type){
+        RealMatrix matrix = new Array2DRowRealMatrix(dataset.Xexpanded, false);
+        RealVector yMatrix = new ArrayRealVector(dataset.y, false);
+        RealVector result;
+        switch (type) {
+            case "svc":
+                result = (new SingularValueDecomposition(matrix)).getSolver().solve(yMatrix);
+                break;
+        
+            default:
+                result = (new QRDecomposition(matrix)).getSolver().solve(yMatrix);
+                break;
         }
+        return result.toArray();  
+    }
     
-        public static double[] predict(double[][] X, double[] coefs){
-            double[] yHat = new double[X.length];
-            for (int i = 0; i < X.length; i++) {
-                for(int j=0; j < X[0].length;j++){
-                    yHat[i]+=coefs[j]*X[i][j];
-                }
+    public static double[] predict(double[][] X, double[] coefs, Double bias){
+        double[] yHat = new double[X.length];
+        for (int i = 0; i < X.length; i++) {
+            for(int j=0; j < X[0].length;j++){
+                yHat[i]+=coefs[j]*X[i][j];
             }
-            return yHat;
+            if(bias != null){
+                yHat[i]+= bias;
+            }
         }
+        return yHat;
+    }
+
+    public static List<Object> estimateCoefByGradient(Dataset dataset, double lr, int epochs){
+        double[] coefs = new double[dataset.X[0].length];
+        double bias = 0.0;
+        RealVector yVector = new ArrayRealVector(dataset.y, false);
+        RealMatrix xMatrix = new Array2DRowRealMatrix(dataset.X, false);
+        RealVector yHatVector;
+        RealVector diffVector;
+        double[] dw = new double[coefs.length]; 
+        double db = 0.0;
+        Sum sum = new Sum();
+        while(epochs>0){
+            yHatVector = new ArrayRealVector(predict(dataset.X, coefs, bias),false);
+            diffVector = yHatVector.subtract(yVector);
+
+            for(int i = 0; i<coefs.length;i++){
+                dw[i] = (1.0/(2*coefs.length))*xMatrix.getColumnVector(i).dotProduct(diffVector);
+                db = (1.0/(2*coefs.length))*sum.evaluate(diffVector.toArray());
+            }
+            for(int i=0; i<coefs.length; i++){
+                coefs[i]-=lr*dw[i];
+            }
+            bias -= lr*db; 
+            epochs--;
+            
+        }
+        return Arrays.asList(coefs,bias);
+    }
 }
 

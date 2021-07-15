@@ -8,24 +8,30 @@ import javafx.scene.Scene;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import javafx.stage.Stage;
 
 public class App extends Application {
 
-    private ScatterChart<Number, Number> createScatterChart(double[] x, double[] y, double[] yHat){
-        final ScatterChart<Number, Number> sc = new ScatterChart<>(new NumberAxis(), new NumberAxis());
-        sc.setTitle("Simple Linear Regression");
-        XYChart.Series series1 = new XYChart.Series();
-        XYChart.Series series2 = new XYChart.Series();
-        series1.setName("Original Data");
-        series2.setName("Regression");
-        for (int i = 0; i < y.length; i++) {
-            series1.getData().add(new XYChart.Data(x[i], y[i]));
-            series2.getData().add(new XYChart.Data(x[i], yHat[i]));
+    private XYChart.Series createSeries(String name, double[] xValues, double[] yValues){
+        XYChart.Series series = new XYChart.Series();
+        series.setName(name);
+        for (int i = 0; i < yValues.length; i++) {
+            series.getData().add(new XYChart.Data(xValues[i], yValues[i]));
         }
-    
-        sc.getData().addAll(series1, series2);
+        return series;
+    }
+
+    private ScatterChart<Number, Number> createScatterChart(double[] x, double[] y, List<double[]> yHatList, List<String> yHatNames, String title){
+        final ScatterChart<Number, Number> sc = new ScatterChart<>(new NumberAxis(), new NumberAxis());
+        sc.setTitle(title);
+        XYChart.Series series = createSeries(title, x, y);
+        sc.getData().addAll(series);
+        for(int j = 0; j < yHatList.size(); j++){
+            sc.getData().add(createSeries(yHatNames.get(j), x, yHatList.get(j)));
+        }
 
         return sc;
 
@@ -38,44 +44,66 @@ public class App extends Application {
         double[] yHat = null;
         double[] yAxis = null;
         double[] xAxis = null;
+        List<double[]> yHatList;
+        List<String> yHatNames;
+        Scene scene = null;
         switch (list.get(0)) {
             case "simple":
                 SimpleLinearRegression.Dataset datasetSimple = SimpleLinearRegression.readDataset("../dataset/simple_regression.csv");
                 Map<String, Double> m = SimpleLinearRegression.estimateCoef(datasetSimple.x, datasetSimple.y);
                 yHat = SimpleLinearRegression.predict(datasetSimple, m);
-                yAxis = datasetSimple.y;
                 xAxis = datasetSimple.x;
+                yHatList = new ArrayList<double[]>();
+                yHatNames = new ArrayList<String>();
+                yHatList.add(yHat);
+                yHatNames.add("Predicted");
+                scene = new Scene(createScatterChart(xAxis, datasetSimple.y, yHatList, yHatNames, "Simple Linear Regression"));
+                stage.setScene(scene);
                 break;
 
             case "linear":
                 LinearRegression.Dataset datasetLinear = LinearRegression.readDataset("../dataset/linear_regression.csv", true);
                 coefs = LinearRegression.estimateCoef(datasetLinear.X, datasetLinear.y, "");
                 yHat = LinearRegression.predict(datasetLinear, coefs);
-                yAxis = datasetLinear.y;
                 xAxis = new double[datasetLinear.y.length];
-                for(int i=0;i<yAxis.length;i++){
+                for(int i=0;i<datasetLinear.y.length;i++){
                     xAxis[i] = i;
                 }
+                yHatList = new ArrayList<double[]>();
+                yHatNames = new ArrayList<String>();
+                yHatList.add(yHat);
+                yHatNames.add("Predicted");
+                scene = new Scene(createScatterChart(xAxis, datasetLinear.y, yHatList, yHatNames, "Linear Regression"));
+                stage.setScene(scene);;
                 break;
 
             case "poly":
                 PolynomialRegression.Dataset datasetPoly = PolynomialRegression.readDataset("../dataset/polynomial_regression_data.csv", 7);
-                coefs = PolynomialRegression.estimateCoef(datasetPoly, datasetPoly.y, "");
-                yHat = PolynomialRegression.predict(datasetPoly.XwithBias, coefs);
-                yAxis = datasetPoly.y;
+                coefs = PolynomialRegression.estimateCoef(datasetPoly, "");
+                yHat = PolynomialRegression.predict(datasetPoly.Xexpanded, coefs, null);
+                
+                List<Object> coefsAndBias = PolynomialRegression.estimateCoefByGradient(datasetPoly, 0.01,200);
+                double[] coefsGradient = (double[]) coefsAndBias.get(0);
+                double bias = (double) coefsAndBias.get(1);
+                double[] yHatGradient = PolynomialRegression.predict(datasetPoly.X, coefsGradient, bias);
                 xAxis = new double[datasetPoly.X.length];
-                for(int i=0; i<yAxis.length; i++){
+                for(int i=0; i<xAxis.length; i++){
                     xAxis[i] = datasetPoly.X[i][datasetPoly.X[i].length-2];
                 }
+                yHatList = new ArrayList<double[]>();
+                yHatNames = new ArrayList<String>();
+                yHatList.add(yHat);yHatList.add(yHatGradient);
+                yHatNames.add("OLS Method");yHatNames.add("Gradient Method");
+                scene = new Scene(createScatterChart(xAxis, datasetPoly.y, yHatList, yHatNames, "Polynomial Regression"));
+                stage.setScene(scene);
                 break;
+
             default:
                 System.out.println("Please run argument simple|linear|poly");
                 break;
         }
 
-        if(yHat != null && yAxis != null && xAxis != null){
-            Scene scene = new Scene(createScatterChart(xAxis, yAxis, yHat));
-            stage.setScene(scene);
+        if(scene != null){
             stage.show();
         }
     }
