@@ -11,7 +11,6 @@ import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class App extends Application {
 
@@ -81,18 +80,24 @@ public class App extends Application {
                 coefs = PolynomialRegression.estimateCoef(datasetPoly, "");
                 yHat = PolynomialRegression.predict(datasetPoly.Xexpanded, coefs, null);
                 
-                List<Object> coefsAndBias = PolynomialRegression.estimateCoefByGradient(datasetPoly, 0.1 ,200, "mae");
-                double[] coefsGradient = (double[]) coefsAndBias.get(0);
-                double bias = (double) coefsAndBias.get(1);
-                double[] yHatGradient = PolynomialRegression.predict(datasetPoly.X, coefsGradient, bias);
+                List<Object> coefsAndBiasMAE = PolynomialRegression.estimateCoefByGradient(datasetPoly, 0.1, 400, "mae");
+                double[] coefsGradientMAE = (double[]) coefsAndBiasMAE.get(0);
+                double biasMAE = (double) coefsAndBiasMAE.get(1);
+                double[] yHatGradientMAE = PolynomialRegression.predict(datasetPoly.X, coefsGradientMAE, biasMAE);
+                
+                List<Object> coefsAndBiasMSE = PolynomialRegression.estimateCoefByGradient(datasetPoly, 0.01, 200, "mse");
+                double[] coefsGradientMSE = (double[]) coefsAndBiasMSE.get(0);
+                double biasMSE = (double) coefsAndBiasMSE.get(1);
+                double[] yHatGradientMSE = PolynomialRegression.predict(datasetPoly.X, coefsGradientMSE, biasMSE);
+
                 xAxis = new double[datasetPoly.X.length];
                 for(int i=0; i<xAxis.length; i++){
                     xAxis[i] = datasetPoly.X[i][datasetPoly.X[i].length-2];
                 }
                 yHatList = new ArrayList<double[]>();
                 yHatNames = new ArrayList<String>();
-                yHatList.add(yHat);yHatList.add(yHatGradient);
-                yHatNames.add("OLS Method");yHatNames.add("Gradient Method");
+                yHatList.add(yHat); yHatList.add(yHatGradientMAE); yHatList.add(yHatGradientMSE);
+                yHatNames.add("OLS Method"); yHatNames.add("Gradient MAE Method"); yHatNames.add("Gradient MSE Method"); 
                 scene = new Scene(createScatterChart(xAxis, datasetPoly.y, yHatList, yHatNames, "Polynomial Regression"));
                 stage.setScene(scene);
                 break;
