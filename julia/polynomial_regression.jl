@@ -10,7 +10,7 @@ using DataFrames
 using CSV
 using Plots
 include("utils.jl")
-
+include("gradients.jl")
 
 function expand_matrix(data:: Matrix{Float64}, degree::Int)
     m_expanded = zeros(length(data),degree)
@@ -24,7 +24,8 @@ function expand_matrix(data:: Matrix{Float64}, degree::Int)
 end
 
 
-function estimate_coef(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epochs::Int, learning_rate::Float64)
+function estimate_coef(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epochs::Int, learning_rate::Float64, 
+    func_adjust::Function)
     X = expand_matrix(x, degrees)
     n_rows, n_cols = size(X)
 
@@ -34,7 +35,7 @@ function estimate_coef(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epo
     losses = []
     for _ in 1:epochs
         y_hat = X*w .+ b
-        dw, db = gradient_descendent(X, y, y_hat)
+        dw, db = func_adjust(X, y, y_hat)
         w -= learning_rate*dw
         b -= learning_rate*db
         
@@ -47,7 +48,7 @@ function estimate_coef(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epo
 end
 
 function estimate_coef_with_batch(x::Matrix{Float64}, y::Matrix{Float64}, bs::Int, degrees::Int, epochs::Int,
-                                  learning_rate::Float64)
+                                  learning_rate::Float64, func_adjust::Function)
     X = expand_matrix(x, degrees)
     n_rows, n_cols = size(X)
 
@@ -62,7 +63,7 @@ function estimate_coef_with_batch(x::Matrix{Float64}, y::Matrix{Float64}, bs::In
             
             y_hat = Xb * w .+ b
 
-            dw, db = gradient_descendent(Xb, yb, y_hat)
+            dw, db = func_adjust(Xb, yb, y_hat)
 
             w -= learning_rate*dw
             b -= learning_rate*db
@@ -87,7 +88,7 @@ function main()
 
     x_train, y_train, x_test, y_test = split_dataset(X, y, 0.7)
 
-    w, b, losses = estimate_coef_with_batch(x_train, y_train, 10, 14, 2000, 0.01)
+    w, b, losses = estimate_coef_with_batch(x_train, y_train, 10, 14, 2000, 0.01, update_weights_mae)
 
     X_test = expand_matrix(x_test, 14)
     y_hat = X_test * w .+ b

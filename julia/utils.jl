@@ -27,16 +27,6 @@ function split_dataset(X::Matrix{Float64}, y:: Matrix{Float64}, percent::Float64
 end
 
 
-function gradient_descendent(X::Matrix{Float64}, y::Vector{Float64}, y_hat:: Matrix{Float64})
-    n_rows = size(X,1)
-
-    dw = (1/n_rows) * (transpose(X) *(y_hat - y))
-    db = (1/n_rows) * sum(y_hat - y)
-
-    return dw, db
-end
-
-
 function mse(y::Matrix{Float64}, y_hat::Matrix{Float64})
     return sum((y_hat .- y).^2)/length(y)
 end
