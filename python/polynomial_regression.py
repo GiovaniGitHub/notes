@@ -49,10 +49,10 @@ if __name__ == "__main__":
 
     weights = estimate_coef(X, y, degrees=5)
     weights_gd, linear_coef_gd, losses = get_coef_with_gradient(
-        X, y, 5, 20000, lr=0.01, func_adjust=update_weights_mse)
+        X, y, 5, 20000, lr=0.01, func_adjust=update_weights_mae)
 
     weights_gd_batch, linear_coef_bd_batch, losses = get_coef_with_gradient(
-        X, y, 5, 200, lr=0.01, batch=10, func_adjust=update_weights_mse)
+        X, y, 5, 200, lr=0.01, batch=10, func_adjust=update_weights_mae)
 
     y_hat = dot(expand_matrix(X, 5, 0), weights)
     y_hat_gradient = dot(expand_matrix(X, 5, 1), weights_gd) + linear_coef_gd

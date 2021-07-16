@@ -31,10 +31,10 @@ func UpdateWeightsMAE(x mat.Matrix, y mat.Matrix, y_hat mat.Matrix) ([]float64, 
 		for i := 0; i < n_rows; i++ {
 			dw[j] += x.At(i, j) * err_vector[i]
 		}
-		dw[j] = (1.0 / SumAbs(diff)) * diff[j]
+		dw[j] = (1.0 / SumAbs(err_vector)) * diff[j]
 	}
 
-	db := (1.0 / SumAbs(diff)) * Sum(err_vector)
+	db := (1.0 / SumAbs(err_vector)) * Sum(err_vector)
 
 	return dw, db
 }

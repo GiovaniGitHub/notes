@@ -14,8 +14,8 @@ def update_weights_mse(x, y, y_hat):
 def update_weights_mae(x, y, y_hat):
 
     dif = dot(x.T, (y_hat - y))
-    dw = (1/sum(abs(dif))*dif)
-    db = (1/sum(abs(dif)))*sum((y_hat - y))
+    dw = (1/sum(abs(y_hat - y))*dif)
+    db = (1/sum(abs(y_hat - y)))*sum((y_hat - y))
 
     return dw, db
 

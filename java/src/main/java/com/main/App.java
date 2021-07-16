@@ -42,7 +42,6 @@ public class App extends Application {
         List<String> list = params.getRaw();
         double[] coefs = null;
         double[] yHat = null;
-        double[] yAxis = null;
         double[] xAxis = null;
         List<double[]> yHatList;
         List<String> yHatNames;
