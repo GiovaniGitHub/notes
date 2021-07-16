@@ -13,8 +13,6 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
-import org.apache.commons.math3.ml.neuralnet.UpdateAction;
-import org.apache.commons.math3.stat.descriptive.summary.Sum;
 import org.apache.commons.math3.linear.QRDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 
@@ -86,23 +84,36 @@ public class PolynomialRegression {
         return yHat;
     }
 
-    public static List<Object> updateWeightsMse(RealMatrix xMatrix, RealVector diffVector){
-        double[] dw = new double[xMatrix.getColumnDimension()]; 
-        double db = 0.0;
-        for(int i = 0; i<xMatrix.getColumnDimension();i++){
-            dw[i] = (1.0/(2*xMatrix.getColumnDimension()))*xMatrix.getColumnVector(i).dotProduct(diffVector);
-            db = (1.0/(2*xMatrix.getColumnDimension()))*Arrays.stream(diffVector.toArray()).sum();
-            
-        }
-        List<Object> resp = new ArrayList<Object>();
-        resp.add(dw);resp.add(db);
-        return resp;
-    }
-    public static List<Object> estimateCoefByGradient(Dataset dataset, double lr, int epochs){
+    // public static List<Object> updateWeightsMae(RealMatrix xMatrix, RealVector diffVector){
+        
+    //     double[] dw = new double[xMatrix.getColumnDimension()]; 
+    //     double db = 0.0;
+
+    //     for(int i = 0; i<xMatrix.getColumnDimension();i++){
+    //         dw[i] = (1.0/diffVector.getL1Norm())*xMatrix.getColumnVector(i).dotProduct(diffVector);
+    //     }
+    //     db = (1.0/diffVector.getL1Norm())*Arrays.stream(diffVector.toArray()).sum();
+    //     List<Object> resp = new ArrayList<Object>();
+    //     resp.add(dw);resp.add(db);
+    //     return resp;
+    // }
+
+    // public static List<Object> updateWeightsMse(RealMatrix xMatrix, RealVector diffVector){
+    //     double[] dw = new double[xMatrix.getColumnDimension()]; 
+    //     double db = 0.0;
+    //     for(int i = 0; i<xMatrix.getColumnDimension();i++){
+    //         dw[i] = (1.0/(xMatrix.getColumnDimension()))*xMatrix.getColumnVector(i).dotProduct(diffVector);
+    //     }
+    //     db = (1.0/(xMatrix.getColumnDimension()))*Arrays.stream(diffVector.toArray()).sum();
+    //     List<Object> resp = new ArrayList<Object>();
+    //     resp.add(dw);resp.add(db);
+    //     return resp;
+    // }
+    public static List<Object> estimateCoefByGradient(Dataset dataset, double lr, int epochs, String gradientType){
         double[] coefs = new double[dataset.X[0].length];
         double bias = 0.0;
-        RealVector yVector = new ArrayRealVector(dataset.y, false);
         RealMatrix xMatrix = new Array2DRowRealMatrix(dataset.X, false);
+        RealVector yVector = new ArrayRealVector(dataset.y, false);
         RealVector yHatVector;
         RealVector diffVector;
         double[] dw = new double[coefs.length]; 
@@ -110,7 +121,7 @@ public class PolynomialRegression {
         while(epochs>0){
             yHatVector = new ArrayRealVector(predict(dataset.X, coefs, bias),false);
             diffVector = yHatVector.subtract(yVector);
-            List<Object> valuesUpdate = updateWeightsMse(xMatrix, diffVector);
+            List<Object> valuesUpdate = Gradient.evaluate(xMatrix, diffVector, gradientType);
             dw = (double[]) valuesUpdate.get(0);
             db = (double) valuesUpdate.get(1);
             for(int i=0; i<coefs.length; i++){

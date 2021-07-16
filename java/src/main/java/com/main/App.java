@@ -8,10 +8,10 @@ import javafx.scene.Scene;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import javafx.stage.Stage;
 
 public class App extends Application {
 
@@ -82,7 +82,7 @@ public class App extends Application {
                 coefs = PolynomialRegression.estimateCoef(datasetPoly, "");
                 yHat = PolynomialRegression.predict(datasetPoly.Xexpanded, coefs, null);
                 
-                List<Object> coefsAndBias = PolynomialRegression.estimateCoefByGradient(datasetPoly, 0.01,200);
+                List<Object> coefsAndBias = PolynomialRegression.estimateCoefByGradient(datasetPoly, 0.1 ,200, "mae");
                 double[] coefsGradient = (double[]) coefsAndBias.get(0);
                 double bias = (double) coefsAndBias.get(1);
                 double[] yHatGradient = PolynomialRegression.predict(datasetPoly.X, coefsGradient, bias);
