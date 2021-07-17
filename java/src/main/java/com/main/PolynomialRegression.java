@@ -84,31 +84,6 @@ public class PolynomialRegression {
         return yHat;
     }
 
-    // public static List<Object> updateWeightsMae(RealMatrix xMatrix, RealVector diffVector){
-        
-    //     double[] dw = new double[xMatrix.getColumnDimension()]; 
-    //     double db = 0.0;
-
-    //     for(int i = 0; i<xMatrix.getColumnDimension();i++){
-    //         dw[i] = (1.0/diffVector.getL1Norm())*xMatrix.getColumnVector(i).dotProduct(diffVector);
-    //     }
-    //     db = (1.0/diffVector.getL1Norm())*Arrays.stream(diffVector.toArray()).sum();
-    //     List<Object> resp = new ArrayList<Object>();
-    //     resp.add(dw);resp.add(db);
-    //     return resp;
-    // }
-
-    // public static List<Object> updateWeightsMse(RealMatrix xMatrix, RealVector diffVector){
-    //     double[] dw = new double[xMatrix.getColumnDimension()]; 
-    //     double db = 0.0;
-    //     for(int i = 0; i<xMatrix.getColumnDimension();i++){
-    //         dw[i] = (1.0/(xMatrix.getColumnDimension()))*xMatrix.getColumnVector(i).dotProduct(diffVector);
-    //     }
-    //     db = (1.0/(xMatrix.getColumnDimension()))*Arrays.stream(diffVector.toArray()).sum();
-    //     List<Object> resp = new ArrayList<Object>();
-    //     resp.add(dw);resp.add(db);
-    //     return resp;
-    // }
     public static List<Object> estimateCoefByGradient(Dataset dataset, double lr, int epochs, String gradientType){
         double[] coefs = new double[dataset.X[0].length];
         double bias = 0.0;

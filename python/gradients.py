@@ -5,17 +5,17 @@ from utils import mse
 def update_weights_mse(x, y, y_hat):
     n_rows, _ = x.shape
 
-    dw = (1/(2*n_rows))*dot(x.T, (y_hat - y))
-    db = (1/(2*n_rows))*sum((y_hat - y))
+    dw = (1/(2*n_rows))*dot(x.T, (y - y_hat))
+    db = (1/(2*n_rows))*sum((y - y_hat))
 
     return dw, db
 
 
 def update_weights_mae(x, y, y_hat):
 
-    dif = dot(x.T, (y_hat - y))
-    dw = (1/sum(abs(y_hat - y))*dif)
-    db = (1/sum(abs(y_hat - y)))*sum((y_hat - y))
+    dif = dot(x.T, (y - y_hat))
+    dw = (1/sum(abs(y - y_hat))*dif)
+    db = (1/sum(abs(y - y_hat)))*sum((y - y_hat))
 
     return dw, db
 
@@ -52,8 +52,8 @@ def adjust_weights_with_batch(X, y, w, b, epochs, batch, losses, lr,
 
             dw, db = func_adjust(Xb, yb, y_hat)
 
-            w -= lr*dw
-            b -= lr*db
+            w += lr*dw
+            b += lr*db
         error = mse(y, dot(X, w))
         losses.append(error)
 
@@ -72,8 +72,8 @@ def adjust_weights(X, y, w, b, epochs, losses, lr, func_adjust,
     for _ in range(epochs):
         y_hat = dot(X, w) + b
         dw, db = func_adjust(X, y, y_hat)
-        w -= lr*dw
-        b -= lr*db
+        w += lr*dw
+        b += lr*db
 
         error = mse(y, dot(X, w) + b)
         losses.append(error)
