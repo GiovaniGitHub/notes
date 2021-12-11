@@ -1,8 +1,17 @@
 from gradients import adjust_weights, adjust_weights_with_batch, \
     update_weights_mae, update_weights_huber, update_weights_mse
 import pandas as pd
-from numpy import dot, zeros, array
+from numpy import dot, zeros, array, sqrt, sign, random
 from numpy.linalg import inv
+
+def randomize_dataset(X, y):
+    n_rows, _ = X.shape
+    idx = list(range(0, n_rows))
+    idx = random.permutation(idx)
+    X = X[idx, :]
+    y = y[idx, :]
+    
+    return X, y
 
 
 def expand_matrix(x, max_coef, min_coef=0):
@@ -28,13 +37,15 @@ def get_coef_with_gradient(x, y, degrees, epochs, lr, func_adjust, batch=None,
     w = zeros((n_cols, 1))
     losses = []
     b = 0
-
+    if is_stochastic:
+        X, y = randomize_dataset(X, y)
+        
     if batch:
         w, b, losses = adjust_weights_with_batch(
-            X, y, w, b, epochs, batch, losses, lr, func_adjust, is_stochastic)
+            X, y, w, b, epochs, batch, losses, lr, func_adjust)
     else:
         w, b, losses = adjust_weights(
-            X, y, w, b, epochs, losses, lr, func_adjust, is_stochastic)
+            X, y, w, b, epochs, losses, lr, func_adjust)
 
     return w, b, losses
 
@@ -49,10 +60,10 @@ if __name__ == "__main__":
     degree = 7
     weights = estimate_coef(X, y, degree)
     weights_gd, linear_coef_gd, losses = get_coef_with_gradient(
-        X, y, degree, 20000, lr=0.01, func_adjust=update_weights_mse)
+        X, y, degree, 2000, lr=0.01, func_adjust=update_weights_mse)
 
     weights_gd_batch, linear_coef_bd_batch, losses = get_coef_with_gradient(
-        X, y, degree, 200, lr=0.01, batch=10, func_adjust=update_weights_mae)
+        X, y, degree, 20, lr=0.01, batch=10, func_adjust=update_weights_mae, is_stochastic=True)
 
     y_hat = dot(expand_matrix(X, degree, 0), weights)
     y_hat_gradient = dot(expand_matrix(X, degree, 1), weights_gd) + linear_coef_gd

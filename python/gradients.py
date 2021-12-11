@@ -35,7 +35,7 @@ def update_weights_huber(x, y, y_hat, delta=1):
 
 
 def adjust_weights_with_batch(X, y, w, b, epochs, batch, losses, lr,
-                              func_adjust, is_stochastic=False):
+                              func_adjust):
     n_rows, _ = X.shape
     for _ in range(epochs):
         for i in range((n_rows-1)//batch + 1):
@@ -44,8 +44,6 @@ def adjust_weights_with_batch(X, y, w, b, epochs, batch, losses, lr,
             end_i = start_i + batch
             idx = list(range(start_i, end_i))
 
-            if is_stochastic:
-                idx = random.permutation(idx)
             Xb = X[idx, :]
             yb = y[idx, :]
             y_hat = dot(Xb, w) + b
@@ -60,14 +58,7 @@ def adjust_weights_with_batch(X, y, w, b, epochs, batch, losses, lr,
     return w, b, losses
 
 
-def adjust_weights(X, y, w, b, epochs, losses, lr, func_adjust,
-                   is_stochastic=False):
-    if is_stochastic:
-        n_rows, _ = X.shape
-        idx = list(range(0, n_rows))
-        idx = random.permutation(idx)
-        X = X[idx, :]
-        y = y[idx, :]
+def adjust_weights(X, y, w, b, epochs, losses, lr, func_adjust):
 
     for _ in range(epochs):
         y_hat = dot(X, w) + b
