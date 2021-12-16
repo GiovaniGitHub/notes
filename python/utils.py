@@ -1,6 +1,14 @@
 from numpy import mean, array
 from numpy.random import permutation
 
+def randomize_dataset(X, y):
+    n_rows, _ = X.shape
+    idx = list(range(0, n_rows))
+    idx = permutation(idx)
+    X = X[idx, :]
+    y = y[idx, :]
+    
+    return X, y
 
 def split_dataset(x, y, percent):
 

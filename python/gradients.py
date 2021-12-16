@@ -52,7 +52,7 @@ def adjust_weights_with_batch(X, y, w, b, epochs, batch, losses, lr,
 
             w -= lr*dw
             b -= lr*db
-        error = mse(y, dot(X, w))
+        error = mse(y, dot(X, w) + b)
         losses.append(error)
 
     return w, b, losses
