@@ -36,6 +36,4 @@ func LogisticRegression() {
 			}
 		}
 	}
-
-	X_train, y_train, X_test, y_test := SplitDataset(X_dense, y_dense, 0.8)
 }
