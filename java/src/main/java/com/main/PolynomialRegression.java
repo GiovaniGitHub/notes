@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -96,7 +95,7 @@ public class PolynomialRegression {
         while(epochs>0){
             yHatVector = new ArrayRealVector(predict(dataset.X, coefs, bias),false);
             diffVector = yHatVector.subtract(yVector);
-            List<Object> valuesUpdate = Gradient.evaluate(xMatrix, diffVector, gradientType);
+            List<Object> valuesUpdate = Gradient.evaluate(xMatrix, diffVector, gradientType, 1);
             dw = (double[]) valuesUpdate.get(0);
             db = (double) valuesUpdate.get(1);
             for(int i=0; i<coefs.length; i++){

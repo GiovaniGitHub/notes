@@ -9,7 +9,7 @@ import org.apache.commons.math3.linear.RealVector;
 
 public class Gradient {
 
-    public static List<Object> evaluate(RealMatrix xMatrix, RealVector diffVector, String type){
+    public static List<Object> evaluate(RealMatrix xMatrix, RealVector diffVector, String type, double delta){
         List<Object> resp;
         switch(type){
             case "mse":
@@ -19,6 +19,9 @@ public class Gradient {
             case "mae":
                 resp = updateWeightsMae(xMatrix, diffVector);
                 break;
+
+            case "hue":
+                resp = updateWeightsHuber(xMatrix, diffVector, delta);
 
             default:
                 resp = updateWeightsMse(xMatrix, diffVector);
@@ -50,5 +53,25 @@ public class Gradient {
         List<Object> resp = new ArrayList<Object>();
         resp.add(dw);resp.add(db);
         return resp;
+    }
+
+    private static List<Object> updateWeightsHuber(RealMatrix xMatrix, RealVector diffVector, Double delta){
+        double[] dw = new double[xMatrix.getColumnDimension()]; 
+        double db = 0.0;
+        if(Arrays.stream(diffVector.toArray()).sum()<= delta){
+            for(int i = 0; i<xMatrix.getColumnDimension();i++){
+                dw[i] = (1.0/(xMatrix.getColumnDimension()))*xMatrix.getColumnVector(i).dotProduct(diffVector);
+            }
+        } else {
+            for(int i = 0; i<xMatrix.getColumnDimension();i++){
+                dw[i] = (1.0/diffVector.getL1Norm())*xMatrix.getColumnVector(i).dotProduct(diffVector);
+            }
+            db = (1.0/diffVector.getL1Norm())*Arrays.stream(diffVector.toArray()).sum();
+        }
+
+        List<Object> resp = new ArrayList<Object>();
+        resp.add(dw);resp.add(db);
+        return resp;
+
     }
 }

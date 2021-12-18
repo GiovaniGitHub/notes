@@ -90,15 +90,29 @@ public class App extends Application {
                 double biasMSE = (double) coefsAndBiasMSE.get(1);
                 double[] yHatGradientMSE = PolynomialRegression.predict(datasetPoly.X, coefsGradientMSE, biasMSE);
 
+                List<Object> coefsAndBiasHue = PolynomialRegression.estimateCoefByGradient(datasetPoly, 0.01, 200, "hue");
+                double[] coefsGradientHue = (double[]) coefsAndBiasHue.get(0);
+                double biasHue = (double) coefsAndBiasHue.get(1);
+                double[] yHatGradientHue = PolynomialRegression.predict(datasetPoly.X, coefsGradientHue, biasHue);
+
                 xAxis = new double[datasetPoly.X.length];
                 for(int i=0; i<xAxis.length; i++){
                     xAxis[i] = datasetPoly.X[i][datasetPoly.X[i].length-2];
                 }
                 yHatList = new ArrayList<double[]>();
                 yHatNames = new ArrayList<String>();
-                yHatList.add(yHat); yHatList.add(yHatGradientMAE); yHatList.add(yHatGradientMSE);
-                yHatNames.add("OLS Method"); yHatNames.add("Gradient MAE Method"); yHatNames.add("Gradient MSE Method"); 
+                yHatList.add(yHat);
+                yHatList.add(yHatGradientMAE);
+                yHatList.add(yHatGradientMSE);
+                yHatList.add(yHatGradientHue);
+                
+                yHatNames.add("OLS Method");
+                yHatNames.add("Gradient MAE Method");
+                yHatNames.add("Gradient MSE Method");
+                yHatNames.add("Gradient Hue Method");
+
                 scene = new Scene(createScatterChart(xAxis, datasetPoly.y, yHatList, yHatNames, "Polynomial Regression"));
+                scene.getStylesheets().add("src/css/chart.css");
                 stage.setScene(scene);
                 break;
 
