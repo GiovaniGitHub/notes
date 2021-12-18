@@ -56,9 +56,9 @@ func PolynomialRegression() {
 	b2 := 0.0
 	b3 := 0.0
 
-	paramentersMSE := Parameters{X_dense, y_dense, w, b, 100, losses, 0.01, "mse", false, 0}
-	paramentersMAE := Parameters{X_dense, y_dense, w2, b2, 1000, losses2, 0.01, "mae", false, 0}
-	paramentersHuber := Parameters{X_dense, y_dense, w3, b3, 1000, losses3, 0.01, "huber", false, 0.3}
+	paramentersMSE := Parameters{X_dense, y_dense, w, b, 2000, losses, 0.01, "mse", false, 0}
+	paramentersMAE := Parameters{X_dense, y_dense, w2, b2, 2000, losses2, 0.03, "mae", false, 0}
+	paramentersHuber := Parameters{X_dense, y_dense, w3, b3, 2000, losses3, 0.01, "huber", false, 1}
 
 	w, b = AdjustWeight(paramentersMSE)
 	w2, b2 = AdjustWeight(paramentersMAE)
