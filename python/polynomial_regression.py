@@ -4,6 +4,7 @@ import pandas as pd
 from numpy import dot, zeros, array, sqrt, sign, random, mean, abs
 from numpy.linalg import solve
 from utils import randomize_dataset
+from rbf_regression import RBFRegression
 
 def expand_matrix(x, max_coef, min_coef=0):
     result = []
@@ -40,6 +41,7 @@ def get_coef_with_gradient(x, y, degrees, epochs, lr, func_adjust, batch=None,
 
     return w, b, losses
 
+
 def get_coef_with_elastic_net(x, y, degree, tol=1e-5, max_iterators = 1e6, learning_rate = 1e-4, ridge_coef = 0.6, lasso_coef = 0.2):
     X = expand_matrix(x, degree, 0)
     _, n_cols = X.shape
@@ -63,8 +65,7 @@ def get_coef_with_elastic_net(x, y, degree, tol=1e-5, max_iterators = 1e6, learn
             skip = True
 
     return w
-
-
+    
 if __name__ == "__main__":
     PATH_FILE = "/home/nobrega/Documentos/notes/dataset/polynomial_regression_data.csv"
     df = pd.read_csv(PATH_FILE)
@@ -80,12 +81,14 @@ if __name__ == "__main__":
     weights_gd_batch, linear_coef_bd_batch, losses = get_coef_with_gradient(
         X, y, degree, 20, lr=0.01, batch=10, func_adjust=update_weights_mae, is_stochastic=True)
 
-    # weights_elastic_net = elastic_net(X, y, degree)
+    rbf = RBFRegression(20, beta=4)
+    rbf.fit(expand_matrix(X, degree, 0), y)
     weights_elastic_net = get_coef_with_elastic_net(X,y, degree)
     y_hat = dot(expand_matrix(X, degree, 0), weights)
     y_hat_gradient = dot(expand_matrix(X, degree, 1), weights_gd) + linear_coef_gd
     y_hat_gradient_batch = dot(expand_matrix(X, degree, 1), weights_gd_batch) + linear_coef_bd_batch
     y_hat_elastic_net = dot(expand_matrix(X, degree, 0), weights_elastic_net)
+    y_hat_rbf = rbf.predict(expand_matrix(X, degree, 0))
     from matplotlib import pyplot as plt
 
     plt.plot(y, c='c', label='Original')
@@ -95,5 +98,7 @@ if __name__ == "__main__":
              label='Predicted with Gradient and Batch')
     plt.plot(y_hat_elastic_net, c='k',
              label='Predicted with Elastic Net')
+    plt.plot(y_hat_rbf, c='y',
+             label='Predicted with RBF')
     plt.legend()
     plt.show()
