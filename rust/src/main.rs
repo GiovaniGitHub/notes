@@ -1,6 +1,6 @@
 use std::{fs::File, io::BufReader};
 use rust_regressions::utils::io::{parse_csv, line_and_scatter_plot};
-use rust_regressions::regressions::ols_regression::OLSRegression;
+use rust_regressions::regressions::simple_linear_regression::SimpleLinearRegression;
 use nalgebra::DMatrix;
 
 fn main() -> std::io::Result<()> {
@@ -17,7 +17,7 @@ fn main() -> std::io::Result<()> {
         y.push(*value);
         x.push(x_col[idx]);
     }
-    let mut model = OLSRegression::new();
+    let mut model = SimpleLinearRegression::new();
     model.fit(&x, &y);
     let y_predictions : Vec<f32> = model.predict_list(&x);
     line_and_scatter_plot(x, vec![y, y_predictions], vec!["original", "predicted"]);

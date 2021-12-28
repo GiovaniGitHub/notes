@@ -5,6 +5,7 @@
 * Python
 * Go
 * Java
+* Rust
 
 # Algorithms
 * Linear Regression

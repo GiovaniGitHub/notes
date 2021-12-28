@@ -1,1 +1,1 @@
-pub mod ols_regression;
+pub mod simple_linear_regression;

@@ -1,19 +1,19 @@
 use crate::utils::stats;
 
-pub struct OLSRegression {
+pub struct SimpleLinearRegression {
     pub coefficient: Option<f32>,
     pub bias: Option<f32>,
 }
 
-impl OLSRegression {
+impl SimpleLinearRegression {
     pub fn fit(&mut self, x_values: &Vec<f32>, y_values: &Vec<f32>) {
         let b1 = stats::covariance(x_values, y_values) / stats::variance(x_values);
         self.bias = Some(stats::mean(y_values) - b1 * stats::mean(x_values));
         self.coefficient = Some(b1);
     }
 
-    pub fn new() -> OLSRegression {
-        OLSRegression {
+    pub fn new() -> SimpleLinearRegression {
+        SimpleLinearRegression {
             coefficient: None,
             bias: None,
         }
