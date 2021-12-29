@@ -1,17 +1,16 @@
-use nalgebra::{DMatrix, Scalar};
+use nalgebra::{Scalar};
 use std::{io::BufRead, str::FromStr};
 use plotly::common::Mode;
 use plotly::{Plot, Scatter};
 
 #[allow(non_camel_case_types)]
-pub fn parse_csv<f32, R>(input: R) -> Result<DMatrix<f32>, Box<dyn std::error::Error>>
+pub fn parse_csv<f32, R>(input: R)  -> Result<(usize, usize, Vec<f32>), Box<dyn std::error::Error>>
 where
     f32: FromStr + Scalar,
     f32::Err: std::error::Error,
     R: BufRead,
 {
     let mut data = Vec::new();
-
     let mut rows = 0;
 
     for line in input.lines().skip(1) {
@@ -24,7 +23,7 @@ where
 
     let cols = data.len() / rows;
 
-    Ok(DMatrix::from_row_slice(rows, cols, &data[..]))
+    Ok((rows, cols, data))
 }
 
 pub fn line_and_scatter_plot(x: Vec<f32>, y: Vec<Vec<f32>>, names: Vec<&str>) {
