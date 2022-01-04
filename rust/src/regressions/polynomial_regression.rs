@@ -40,9 +40,10 @@ impl PolynomialRegression {
     }
 
     pub fn fit(&mut self, x: &DenseMatrix<f32>, y: &DenseMatrix<f32>, epochs: usize, lr: f32) {
+        let expanded_matrix = expand_matrix(x, self.degree);
         for _ in 0..epochs {
             let y_hat = self.predict(&x);
-            let (dw, db) = update_weights_mse(&expand_matrix(x, self.degree), y, &y_hat, lr);
+            let (dw, db) = update_weights_mse(&expanded_matrix, y, &y_hat, lr);
             self.coefficients.add_mut(&dw);
             self.bias += db;
         }
