@@ -75,16 +75,16 @@ pub fn update_weights_mse(x: &DenseMatrix<f32>, y: &DenseMatrix<f32>, y_hat: &De
 }
 
 
-pub fn update_weights_mae(x: &DenseMatrix<f32>, y: &DenseMatrix<f32>, y_hat: &DenseMatrix<f32>) -> (DenseMatrix<f32>, f32){
+pub fn update_weights_mae(x: &DenseMatrix<f32>, y: &DenseMatrix<f32>, y_hat: &DenseMatrix<f32>, lr: f32) -> (DenseMatrix<f32>, f32){
     let (n_rows, n_cols )= x.shape();
     let dif = y.sub(y_hat);
     let dif_abs_sum: f32 = dif.clone().to_row_vector().iter().map(|x| x.abs()).sum();
     let mut dw: Vec<f32> = Vec::new();
     for i in 0..n_cols{
-        dw.push((-1.0/(dif_abs_sum))*x.slice(0..n_rows,i..i+1).dot(&dif))
+        dw.push((1.0/dif_abs_sum)*x.slice(0..n_rows,i..i+1).dot(&dif)*lr)
     }
 
     let sum_dif: f32 = dif.iter().sum();
-    let db: f32 = sum_dif.mul(-1.0/dif_abs_sum);
+    let db: f32 = sum_dif.mul(-1.0/dif_abs_sum)*lr;
     return (DenseMatrix::from_array(n_cols,1,&dw), db);
 }

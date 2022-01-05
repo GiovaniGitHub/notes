@@ -67,7 +67,7 @@ def get_coef_with_elastic_net(x, y, degree, tol=1e-5, max_iterators = 1e6, learn
     return w
     
 if __name__ == "__main__":
-    PATH_FILE = "/home/nobrega/Documentos/notes/dataset/polynomial_regression_data.csv"
+    PATH_FILE = "/home/nobrega/Dados/Documentos/Estudos/notes/dataset/polynomial_regression_data.csv"
     df = pd.read_csv(PATH_FILE)
 
     X = df.x.values

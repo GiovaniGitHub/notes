@@ -4,6 +4,7 @@ use rust_regressions::regressions::{
     simple_linear_regression::SimpleLinearRegression,
 };
 use rust_regressions::utils::io::{line_and_scatter_plot, parse_csv};
+use rust_regressions::utils::types::TypeRegression;
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 use smartcore::linalg::BaseMatrix;
 use std::env;
@@ -57,14 +58,18 @@ fn main() -> std::io::Result<()> {
         let y = dense_matrix.slice(0..tuple_result.0, tuple_result.1 - 1..tuple_result.1);
         let x = dense_matrix.slice(0..tuple_result.0, 0..1);
 
-        let mut polynomial_regression = PolynomialRegression::new(7);
-        polynomial_regression.fit(&x, &y, 1000, 0.8);
-        let y_hat = polynomial_regression.predict(&x);
+        let mut polynomial_regression = PolynomialRegression::new(8, TypeRegression::MSE);
+        polynomial_regression.fit(&x, &y, 2000, 0.08);
+        let y_hat_mse = polynomial_regression.predict(&x);
 
+        let mut polynomial_regression = PolynomialRegression::new(8, TypeRegression::MAE);
+        polynomial_regression.fit(&x, &y, 2000, 0.08);
+        let y_hat_mae = polynomial_regression.predict(&x);
+        
         line_and_scatter_plot(
             x.clone().to_row_vector(),
-            vec![y.to_row_vector(), y_hat.transpose().to_row_vector()],
-            vec!["original", "predicted"],
+            vec![y.to_row_vector(), y_hat_mse.transpose().to_row_vector(), y_hat_mae.transpose().to_row_vector()],
+            vec!["original", "predicted MSE", "predicted MAE"],
         )
     }
     Ok(())
