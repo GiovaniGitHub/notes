@@ -12,18 +12,6 @@ using Plots
 include("utils.jl")
 include("gradients.jl")
 
-function expand_matrix(data:: Matrix{Float64}, degree::Int)
-    m_expanded = zeros(length(data),degree)
-    for i = 1:size(m_expanded,1)
-        for j = 1:size(m_expanded,2)
-            m_expanded[i,j] = data[i]^(j-1)
-        end          
-    end
-
-    return m_expanded
-end
-
-
 function estimate_coef(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epochs::Int, learning_rate::Float64, 
     func_adjust::Function)
     X = expand_matrix(x, degrees)

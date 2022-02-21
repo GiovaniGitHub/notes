@@ -30,3 +30,14 @@ end
 function mse(y::Matrix{Float64}, y_hat::Matrix{Float64})
     return sum((y_hat .- y).^2)/length(y)
 end
+
+function expand_matrix(data:: Matrix{Float64}, degree::Int)
+    m_expanded = zeros(length(data),degree)
+    for i = 1:size(m_expanded,1)
+        for j = 1:size(m_expanded,2)
+            m_expanded[i,j] = data[i]^(j-1)
+        end          
+    end
+
+    return m_expanded
+end
