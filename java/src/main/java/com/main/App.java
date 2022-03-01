@@ -3,6 +3,9 @@ package com.main;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.ArrayRealVector;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.chart.NumberAxis;
@@ -95,6 +98,10 @@ public class App extends Application {
                 double biasHue = (double) coefsAndBiasHue.get(1);
                 double[] yHatGradientHue = PolynomialRegression.predict(datasetPoly.X, coefsGradientHue, biasHue);
 
+                RBFRegression rbf = new RBFRegression(20, 4.0);
+                rbf.fit(new Array2DRowRealMatrix(datasetPoly.X, false), new ArrayRealVector(datasetPoly.y));
+                double[] yHatRbf = rbf.predict(new Array2DRowRealMatrix(datasetPoly.X, false)).toArray();
+
                 xAxis = new double[datasetPoly.X.length];
                 for(int i=0; i<xAxis.length; i++){
                     xAxis[i] = datasetPoly.X[i][datasetPoly.X[i].length-2];
@@ -105,17 +112,19 @@ public class App extends Application {
                 yHatList.add(yHatGradientMAE);
                 yHatList.add(yHatGradientMSE);
                 yHatList.add(yHatGradientHue);
+                yHatList.add(yHatRbf);
                 
                 yHatNames.add("OLS Method");
                 yHatNames.add("Gradient MAE Method");
                 yHatNames.add("Gradient MSE Method");
                 yHatNames.add("Gradient Hue Method");
+                yHatNames.add("RBF Regression");
 
                 scene = new Scene(createScatterChart(xAxis, datasetPoly.y, yHatList, yHatNames, "Polynomial Regression"));
                 scene.getStylesheets().add("src/css/chart.css");
                 stage.setScene(scene);
                 break;
-
+            
             default:
                 System.out.println("Please run argument simple|linear|poly");
                 break;
