@@ -65,11 +65,16 @@ fn main() -> std::io::Result<()> {
         let mut polynomial_regression = PolynomialRegression::new(8, TypeRegression::MAE);
         polynomial_regression.fit(&x, &y, 2000, 0.08);
         let y_hat_mae = polynomial_regression.predict(&x);
-        
+
+
+        let mut polynomial_regression = PolynomialRegression::new(8, TypeRegression::HUBER);
+        polynomial_regression.fit(&x, &y, 2000, 0.08);
+        let y_hat_huber = polynomial_regression.predict(&x);
+
         line_and_scatter_plot(
             x.clone().to_row_vector(),
-            vec![y.to_row_vector(), y_hat_mse.transpose().to_row_vector(), y_hat_mae.transpose().to_row_vector()],
-            vec!["original", "predicted MSE", "predicted MAE"],
+            vec![y.to_row_vector(), y_hat_mse.transpose().to_row_vector(), y_hat_mae.transpose().to_row_vector(), y_hat_huber.transpose().to_row_vector()],
+            vec!["original", "predicted MSE", "predicted MAE", "predicted HUE"],
         )
     }
     Ok(())
