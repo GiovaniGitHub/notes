@@ -1,4 +1,5 @@
 pub enum TypeRegression {
     MAE,
-    MSE
+    MSE,
+    HUBER
 }
