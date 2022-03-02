@@ -1,5 +1,5 @@
 use crate::utils::{
-    stats::{update_weights_mse, update_weights_mae},
+    stats::{update_weights_mse, update_weights_mae, update_weights_huber},
     utils::expand_matrix,
     types::TypeRegression
 };
@@ -62,6 +62,14 @@ impl PolynomialRegression {
                     self.coefficients.add_mut(&dw);
                     self.bias += db;
                 }  
+            }
+            TypeRegression::HUBER =>{
+                for _ in 0..epochs {
+                    let y_hat = self.predict(&x);
+                    let (dw, db) = update_weights_huber(&expanded_matrix, y, &y_hat, lr, 1.0);
+                    self.coefficients.add_mut(&dw);
+                    self.bias += db;
+                }
             }
         }
     }
