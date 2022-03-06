@@ -61,7 +61,12 @@ pub fn mae(y: DenseMatrix<f32>, y_hat: DenseMatrix<f32>) -> f32 {
     return aux / n_rows;
 }
 
-pub fn update_weights_mse(x: &DenseMatrix<f32>,y: &DenseMatrix<f32>,y_hat: &DenseMatrix<f32>,lr: f32) -> (DenseMatrix<f32>, f32) {
+pub fn update_weights_mse(
+    x: &DenseMatrix<f32>,
+    y: &DenseMatrix<f32>,
+    y_hat: &DenseMatrix<f32>,
+    lr: f32,
+) -> (DenseMatrix<f32>, f32) {
     let (n_rows, n_cols) = x.shape();
     let dif = y.sub(y_hat);
     let mut dw: Vec<f32> = Vec::new();
@@ -74,7 +79,12 @@ pub fn update_weights_mse(x: &DenseMatrix<f32>,y: &DenseMatrix<f32>,y_hat: &Dens
     return (DenseMatrix::from_array(n_cols, 1, &dw), db);
 }
 
-pub fn update_weights_mae(x: &DenseMatrix<f32>,y: &DenseMatrix<f32>, y_hat: &DenseMatrix<f32>, lr: f32,) -> (DenseMatrix<f32>, f32) {
+pub fn update_weights_mae(
+    x: &DenseMatrix<f32>,
+    y: &DenseMatrix<f32>,
+    y_hat: &DenseMatrix<f32>,
+    lr: f32,
+) -> (DenseMatrix<f32>, f32) {
     let (n_rows, n_cols) = x.shape();
     let dif = y.sub(y_hat);
     let dif_abs_sum: f32 = dif.clone().to_row_vector().iter().map(|x| x.abs()).sum();
@@ -88,7 +98,13 @@ pub fn update_weights_mae(x: &DenseMatrix<f32>,y: &DenseMatrix<f32>, y_hat: &Den
     return (DenseMatrix::from_array(n_cols, 1, &dw), db);
 }
 
-pub fn update_weights_huber(x: &DenseMatrix<f32>,y: &DenseMatrix<f32>, y_hat: &DenseMatrix<f32>, lr: f32, delta: f32) -> (DenseMatrix<f32>, f32) {
+pub fn update_weights_huber(
+    x: &DenseMatrix<f32>,
+    y: &DenseMatrix<f32>,
+    y_hat: &DenseMatrix<f32>,
+    lr: f32,
+    delta: f32,
+) -> (DenseMatrix<f32>, f32) {
     let (n_rows, n_cols) = x.shape();
     let dif = y.sub(y_hat);
     let dif_abs_sum: f32 = dif.clone().to_row_vector().iter().map(|x| x.abs()).sum();
@@ -100,7 +116,7 @@ pub fn update_weights_huber(x: &DenseMatrix<f32>,y: &DenseMatrix<f32>, y_hat: &D
         }
         let sum_dif: f32 = dif.iter().sum();
         db = sum_dif.mul(-1.0 / dif_abs_sum) * lr;
-    }else{
+    } else {
         for i in 0..n_cols {
             dw.push((1.0 / (2.0 * (n_rows as f32))) * x.slice(0..n_rows, i..i + 1).dot(&dif) * lr)
         }
