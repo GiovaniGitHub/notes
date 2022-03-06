@@ -42,18 +42,22 @@ impl RBFRegression {
         for i in 0..num_row {
             let x_row = x.get_row(i);
             for j in 0..self.num_center {
-                let center_array: Vec<f32> = self.centers.get_row(j);
-                let vector = center_array.sub(&x_row);
-                let expoent: f32 = vector.iter().map(|x| x.powf(2.0)).sum();
-                gradient_vector.push((-self.beta * expoent).exp());
+                let norm: f32 = self
+                    .centers
+                    .get_row(j)
+                    .sub(&x_row)
+                    .iter()
+                    .map(|x| x.powf(2.0))
+                    .sum();
+                gradient_vector.push((-self.beta * norm).exp());
             }
         }
 
-        let M: DenseMatrix<f32> =  DenseMatrix::from_array(num_row, num_cols, &gradient_vector);
+        let M: DenseMatrix<f32> = DenseMatrix::from_array(num_row, num_cols, &gradient_vector);
         return M.transpose();
     }
 
-    fn fit(self, x: DenseMatrix<f32>, y: Vec<f32>){
+    fn fit(self, x: DenseMatrix<f32>, y: Vec<f32>) {
         todo!("Fit Method");
     }
 }
