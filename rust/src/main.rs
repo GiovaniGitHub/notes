@@ -2,6 +2,7 @@ use rust_regressions::regressions::{
     linear_regression::LinearRegression,
     polynomial_regression::PolynomialRegression,
     simple_linear_regression::SimpleLinearRegression,
+    rbf_regression::RBFRegression,
 };
 use rust_regressions::utils::io::{line_and_scatter_plot, parse_csv};
 use rust_regressions::utils::types::TypeRegression;
@@ -76,6 +77,17 @@ fn main() -> std::io::Result<()> {
             vec![y.to_row_vector(), y_hat_mse.transpose().to_row_vector(), y_hat_mae.transpose().to_row_vector(), y_hat_huber.transpose().to_row_vector()],
             vec!["original", "predicted MSE", "predicted MAE", "predicted HUE"],
         )
+    }
+
+    else if type_regression == "rbf"{
+        let file: File = File::open(format!("../dataset/{}.csv", dataset_name_file)).unwrap();
+        let tuple_result: (usize, usize, Vec<f32>) = parse_csv(BufReader::new(file)).unwrap();
+        let dense_matrix = DenseMatrix::from_vec(tuple_result.0, tuple_result.1, &tuple_result.2);
+
+        let y = dense_matrix.slice(0..tuple_result.0, tuple_result.1 - 1..tuple_result.1);
+        let x = dense_matrix.slice(0..tuple_result.0, 0..1);
+        
+        let rbf_regression = RBFRegression::new( 4.0, 20, 8, TypeRegression::MSE);
     }
     Ok(())
 }
