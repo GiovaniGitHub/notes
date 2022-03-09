@@ -13,3 +13,4 @@
 * Polynomial Regression
 * Logistic Regression
 * Elastic Net Regression
+* RBF Regression
