@@ -90,7 +90,7 @@ fn main() -> std::io::Result<()> {
                 "predicted MSE",
                 "predicted MAE",
                 "predicted HUE",
-                "predicted RBF"
+                "predicted RBF",
             ],
         )
     }
