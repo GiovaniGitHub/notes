@@ -1,13 +1,14 @@
 use rust_regressions::regressions::{
-    linear_regression::LinearRegression,
-    polynomial_regression::PolynomialRegression,
-    simple_linear_regression::SimpleLinearRegression,
-    rbf_regression::RBFRegression,
+    linear_regression::LinearRegression, polynomial_regression::PolynomialRegression,
+    rbf_regression::RBFRegression, simple_linear_regression::SimpleLinearRegression,
 };
 use rust_regressions::utils::io::{line_and_scatter_plot, parse_csv};
 use rust_regressions::utils::types::TypeRegression;
+
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
+
 use smartcore::linalg::BaseMatrix;
+
 use std::env;
 use std::{fs::File, io::BufReader};
 
@@ -32,7 +33,6 @@ fn main() -> std::io::Result<()> {
         model.fit(&x, &y);
         let y_predictions: Vec<f32> = model.predict_list(&x);
         line_and_scatter_plot(x, vec![y, y_predictions], vec!["original", "predicted"]);
-    
     } else if type_regression == "linear" {
         let file: File = File::open(format!("../dataset/{}.csv", dataset_name_file)).unwrap();
         let tuple_result: (usize, usize, Vec<f32>) = parse_csv(BufReader::new(file)).unwrap();
@@ -67,27 +67,33 @@ fn main() -> std::io::Result<()> {
         polynomial_regression.fit(&x, &y, 2000, 0.08);
         let y_hat_mae = polynomial_regression.predict(&x);
 
-
         let mut polynomial_regression = PolynomialRegression::new(8, TypeRegression::HUBER);
         polynomial_regression.fit(&x, &y, 2000, 0.08);
         let y_hat_huber = polynomial_regression.predict(&x);
 
+        let mut rbf = RBFRegression::new(4.0, 22, 8);
+        rbf.fit(&x, &y);
+
+        let y_hat_rbf = rbf.predict(&x);
+
         line_and_scatter_plot(
             x.clone().to_row_vector(),
-            vec![y.to_row_vector(), y_hat_mse.transpose().to_row_vector(), y_hat_mae.transpose().to_row_vector(), y_hat_huber.transpose().to_row_vector()],
-            vec!["original", "predicted MSE", "predicted MAE", "predicted HUE"],
+            vec![
+                y.to_row_vector(),
+                y_hat_mse.transpose().to_row_vector(),
+                y_hat_mae.transpose().to_row_vector(),
+                y_hat_huber.transpose().to_row_vector(),
+                y_hat_rbf.transpose().to_row_vector(),
+            ],
+            vec![
+                "original",
+                "predicted MSE",
+                "predicted MAE",
+                "predicted HUE",
+                "predicted RBF"
+            ],
         )
     }
 
-    else if type_regression == "rbf"{
-        let file: File = File::open(format!("../dataset/{}.csv", dataset_name_file)).unwrap();
-        let tuple_result: (usize, usize, Vec<f32>) = parse_csv(BufReader::new(file)).unwrap();
-        let dense_matrix = DenseMatrix::from_vec(tuple_result.0, tuple_result.1, &tuple_result.2);
-
-        let y = dense_matrix.slice(0..tuple_result.0, tuple_result.1 - 1..tuple_result.1);
-        let x = dense_matrix.slice(0..tuple_result.0, 0..1);
-        
-        let rbf_regression = RBFRegression::new( 4.0, 20, 8, TypeRegression::MSE);
-    }
     Ok(())
 }
