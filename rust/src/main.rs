@@ -3,7 +3,7 @@ use rust_regressions::regressions::{
     rbf_regression::RBFRegression, simple_linear_regression::SimpleLinearRegression,
 };
 use rust_regressions::utils::io::{line_and_scatter_plot, parse_csv};
-use rust_regressions::utils::types::TypeRegression;
+use rust_regressions::utils::types::{TypeFactoration, TypeRegression};
 
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 
@@ -71,7 +71,7 @@ fn main() -> std::io::Result<()> {
         polynomial_regression.fit(&x, &y, 2000, 0.08);
         let y_hat_huber = polynomial_regression.predict(&x);
 
-        let mut rbf = RBFRegression::new(4.0, 22, 8);
+        let mut rbf = RBFRegression::new(4.0, 22, 8, None);
         rbf.fit(&x, &y);
 
         let y_hat_rbf = rbf.predict(&x);
@@ -91,6 +91,42 @@ fn main() -> std::io::Result<()> {
                 "predicted MAE",
                 "predicted HUE",
                 "predicted RBF",
+            ],
+        )
+    } else if type_regression == "rbf" {
+        let file: File = File::open(format!("../dataset/{}.csv", dataset_name_file)).unwrap();
+        let tuple_result: (usize, usize, Vec<f32>) = parse_csv(BufReader::new(file)).unwrap();
+        let dense_matrix = DenseMatrix::from_vec(tuple_result.0, tuple_result.1, &tuple_result.2);
+
+        let y = dense_matrix.slice(0..tuple_result.0, tuple_result.1 - 1..tuple_result.1);
+        let x = dense_matrix.slice(0..tuple_result.0, 0..1);
+
+        let mut rbf = RBFRegression::new(4.0, 22, 8, Some(TypeFactoration::SVD));
+        rbf.fit(&x, &y);
+        let y_hat_svd = rbf.predict(&x);
+
+        let mut rbf = RBFRegression::new(4.0, 22, 8, Some(TypeFactoration::CHOLESKY));
+        rbf.fit(&x, &y);
+        let y_hat_cholesky = rbf.predict(&x);
+
+        let mut rbf = RBFRegression::new(4.0, 22, 8, Some(TypeFactoration::QR));
+        rbf.fit(&x, &y);
+        let y_hat_qr = rbf.predict(&x);
+
+
+        line_and_scatter_plot(
+            x.clone().to_row_vector(),
+            vec![
+                y.to_row_vector(),
+                y_hat_svd.transpose().to_row_vector(),
+                y_hat_cholesky.transpose().to_row_vector(),
+                y_hat_qr.transpose().to_row_vector(),
+            ],
+            vec![
+                "original",
+                "predicted SVD",
+                "predicted CHOLESKY",
+                "predicted QR",
             ],
         )
     }
