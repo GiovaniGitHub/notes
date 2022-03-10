@@ -1,10 +1,12 @@
 use smartcore::linalg::{
-    naive::dense_matrix::DenseMatrix, svd::SVDDecomposableMatrix, BaseMatrix, BaseVector,
+    naive::dense_matrix::DenseMatrix, qr::QRDecomposableMatrix, svd::SVDDecomposableMatrix,
+    BaseMatrix, BaseVector,
 };
 
 use rand::prelude::SliceRandom;
 use rand::thread_rng;
 
+use crate::utils::types::TypeFactoration;
 use crate::utils::utils::expand_matrix;
 
 pub struct RBFRegression {
@@ -12,11 +14,16 @@ pub struct RBFRegression {
     pub centers: DenseMatrix<f32>,
     pub beta: f32,
     pub weight: DenseMatrix<f32>,
+    pub type_factoration: Option<TypeFactoration>,
 }
 
 impl RBFRegression {
-    pub fn new(beta: f32, num_center: usize, num_cols: usize) -> RBFRegression {
-        // let mut rng = rand::thread_rng();
+    pub fn new(
+        beta: f32,
+        num_center: usize,
+        num_cols: usize,
+        type_factoration: Option<TypeFactoration>,
+    ) -> RBFRegression {
         let mut coefficients_centers: Vec<f32> = Vec::new();
         let mut coefficients_weight: Vec<f32> = Vec::new();
         for _ in 0..num_center {
@@ -31,11 +38,12 @@ impl RBFRegression {
             centers: DenseMatrix::from_array(num_center, num_cols, &coefficients_centers),
             beta,
             weight: DenseMatrix::from_array(num_center, 1, &coefficients_weight),
+            type_factoration,
         }
     }
 
     pub fn fit(&mut self, x: &DenseMatrix<f32>, y: &DenseMatrix<f32>) {
-        let (n_centers, n_columns) = self.centers.shape();
+        let (_, n_columns) = self.centers.shape();
         let x = expand_matrix(&x, n_columns);
 
         let (num_rows, num_cols) = x.shape();
@@ -54,17 +62,42 @@ impl RBFRegression {
         }
 
         let gradient = calculate_gradient(&x, &self.centers, &self.beta);
-        self.weight = gradient
-            .transpose()
-            .matmul(&gradient)
-            .svd_solve_mut(gradient.transpose().matmul(&y).clone())
-            .unwrap();
+        match self.type_factoration {
+            Some(TypeFactoration::SVD) => {
+                self.weight = gradient
+                    .transpose()
+                    .matmul(&gradient)
+                    .svd_solve_mut(gradient.transpose().matmul(&y).clone())
+                    .unwrap();
+            }
+            Some(TypeFactoration::QR) => {
+                self.weight = gradient
+                    .transpose()
+                    .matmul(&gradient)
+                    .qr_solve_mut(gradient.transpose().matmul(&y).clone())
+                    .unwrap();
+            }
+            Some(TypeFactoration::CHOLESKY) => {
+                self.weight = gradient
+                    .transpose()
+                    .matmul(&gradient)
+                    .qr_solve_mut(gradient.transpose().matmul(&y).clone())
+                    .unwrap();
+            }
+            _ => {
+                self.weight = gradient
+                    .transpose()
+                    .matmul(&gradient)
+                    .svd_solve_mut(gradient.transpose().matmul(&y).clone())
+                    .unwrap();
+            }
+        }
     }
 
     pub fn predict(&mut self, x: &DenseMatrix<f32>) -> DenseMatrix<f32> {
-        let (n_centers, n_columns) = self.centers.shape();
+        let (_, n_columns) = self.centers.shape();
         let x = expand_matrix(&x, n_columns);
-        // let (_, num_cols) = self.centers.shape();
+
         return calculate_gradient(&x, &self.centers, &self.beta).matmul(&self.weight);
     }
 }
