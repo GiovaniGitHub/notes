@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
+import org.apache.commons.math3.linear.QRDecomposition;
+import org.apache.commons.math3.linear.DecompositionSolver;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 
 public class RBFRegression {
@@ -99,11 +101,26 @@ public class RBFRegression {
 
     }
 
-    public void fit(RealMatrix X, RealVector y) {
+    public void fit(RealMatrix X, RealVector y, TypesFactorization f) {
         this.setCenters(Utils.getSample(X, this.nCenters));
         RealMatrix gradient = this.getGradient(X);
-        RealVector weights = (new SingularValueDecomposition(gradient)).getSolver().solve(y);
-        this.setWeights(weights);
+        RealVector weights;
+        switch(f) {
+            case SVD:
+                weights = (new SingularValueDecomposition(gradient)).getSolver().solve(y);
+                this.setWeights(weights);
+                break;
+        
+            case QR:
+                weights = (new QRDecomposition(gradient)).getSolver().solve(y);
+                this.setWeights(weights);
+                break;
+
+            default:
+                weights = (new SingularValueDecomposition(gradient)).getSolver().solve(y);
+                this.setWeights(weights);
+                break;
+        }
 
     }
 

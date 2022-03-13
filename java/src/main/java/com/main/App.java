@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 
 public class App extends Application {
+    RBFRegression rbf;
 
     private XYChart.Series createSeries(String name, double[] xValues, double[] yValues) {
         XYChart.Series series = new XYChart.Series();
@@ -108,8 +109,9 @@ public class App extends Application {
                 double biasHue = (double) coefsAndBiasHue.get(1);
                 double[] yHatGradientHue = PolynomialRegression.predict(datasetPoly.X, coefsGradientHue, biasHue);
 
-                RBFRegression rbf = new RBFRegression(20, 4.0);
-                rbf.fit(new Array2DRowRealMatrix(datasetPoly.X, false), new ArrayRealVector(datasetPoly.y));
+                rbf = new RBFRegression(20, 4.0);
+
+                rbf.fit(new Array2DRowRealMatrix(datasetPoly.X, false), new ArrayRealVector(datasetPoly.y), null);
                 double[] yHatRbf = rbf.predict(new Array2DRowRealMatrix(datasetPoly.X, false)).toArray();
 
                 xAxis = new double[datasetPoly.X.length];
@@ -135,8 +137,40 @@ public class App extends Application {
                 stage.setScene(scene);
                 break;
 
+            case "rbf":
+                RBFRegression.Dataset datasetRBF = RBFRegression
+                        .readDataset("../dataset/polynomial_regression_data.csv", 7);
+
+                rbf = new RBFRegression(20, 4.0);
+                rbf.fit(new Array2DRowRealMatrix(datasetRBF.X, false), new ArrayRealVector(datasetRBF.y),
+                        TypesFactorization.SVD);
+                double[] yHatRbfSVD = rbf.predict(new Array2DRowRealMatrix(datasetRBF.X, false)).toArray();
+
+                rbf = new RBFRegression(20, 4.0);
+                rbf.fit(new Array2DRowRealMatrix(datasetRBF.X, false), new ArrayRealVector(datasetRBF.y),
+                        TypesFactorization.QR);
+                double[] yHatRbfQR = rbf.predict(new Array2DRowRealMatrix(datasetRBF.X, false)).toArray();
+
+                rbf = new RBFRegression(20, 4.0);
+
+                xAxis = new double[datasetRBF.X.length];
+                for (int i = 0; i < xAxis.length; i++) {
+                    xAxis[i] = datasetRBF.X[i][datasetRBF.X[i].length - 2];
+                }
+                yHatList = new ArrayList<double[]>();
+                yHatNames = new ArrayList<String>();
+                yHatList.add(yHatRbfQR);
+                yHatList.add(yHatRbfSVD);
+
+                yHatNames.add("QR Factorization");
+                yHatNames.add("SVD Factorization");
+
+                scene = new Scene(
+                        createScatterChart(xAxis, datasetRBF.y, yHatList, yHatNames, "RBF Regression"));
+                stage.setScene(scene);
+                break;
             default:
-                System.out.println("Please run argument simple|linear|poly");
+                System.out.println("Please run argument simple|linear|poly|rbf");
                 break;
         }
 
