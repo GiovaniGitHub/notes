@@ -77,7 +77,7 @@ func PolynomialRegression() {
 
 	p.Title.Text = "Poly Regression"
 
-	plotutil.AddLines(p,
+	plotutil.AddScatters(p,
 		"Original", GeneratePoints(idx, y_dense.RawMatrix().Data),
 		fmt.Sprintf("MSE %.3f", r2(y_hat, y_dense.RawMatrix().Data)), GeneratePoints(idx, y_hat),
 		fmt.Sprintf("MAE %.3f", r2(y_hat2, y_dense.RawMatrix().Data)), GeneratePoints(idx, y_hat2),
