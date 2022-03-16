@@ -1,1 +1,1 @@
-go run utils.go gradients.go linear_regression.go polynomial_regression.go simple_linear_regression.go main.go $1
+go run utils.go gradients.go linear_regression.go polynomial_regression.go simple_linear_regression.go rbf_regression.go main.go $1
