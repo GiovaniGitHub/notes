@@ -10,6 +10,13 @@ import (
 	"gonum.org/v1/plot/plotter"
 )
 
+type TypeFactoration string
+
+const (
+	SVD TypeFactoration = "SVD"
+	QR                  = "QR"
+)
+
 type Parameters struct {
 	X             mat.Matrix
 	y             mat.Matrix
@@ -120,4 +127,13 @@ func SplitDataset(X mat.Matrix, y mat.Matrix, percent float64) (mat.Matrix, mat.
 	}
 
 	return X_train_dense, y_train_dense, X_test_dense, y_test_dense
+}
+
+func GetRowMatrix(x mat.Matrix, idx int) mat.Matrix {
+	_, n_cols_data := x.Dims()
+	row_data := make([]float64, n_cols_data)
+	for ii := 0; ii < n_cols_data; ii++ {
+		row_data[ii] = x.At(idx, ii)
+	}
+	return mat.NewDense(1, n_cols_data, row_data)
 }
