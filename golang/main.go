@@ -14,5 +14,8 @@ func main() {
 
 	case "simple":
 		SimpleLinearRegression()
+
+	case "rbf":
+		RBFRegression()
 	}
 }
