@@ -11,6 +11,9 @@ import (
 	"time"
 
 	"gonum.org/v1/gonum/mat"
+	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotutil"
+	"gonum.org/v1/plot/vg"
 )
 
 type RBFRegressionStruct struct {
@@ -22,12 +25,12 @@ type RBFRegressionStruct struct {
 }
 
 func (rbf *RBFRegressionStruct) SetCenters(X mat.Matrix) {
-	_, n_cols := X.Dims()
+	n_rows, n_cols := X.Dims()
 
 	rand.Seed(time.Now().UTC().UnixNano())
 	NewCenters := mat.NewDense(rbf.NumCenters, n_cols, nil)
 
-	for i, value := range rand.Perm(rbf.NumCenters) {
+	for i, value := range rand.Perm(n_rows)[:rbf.NumCenters] {
 		for j := 0; j < n_cols; j++ {
 			NewCenters.Set(i, j, X.At(value, j))
 		}
@@ -97,6 +100,13 @@ func (rbf *RBFRegressionStruct) Fit(X mat.Matrix, y mat.Matrix) {
 	rbf.Weight = mat.NewDense(n_cols_gradient, 1, c)
 }
 
+func (rbf *RBFRegressionStruct) Predict(X mat.Matrix) []float64 {
+	gradient := rbf.CalculateGradient(X)
+	M := new(mat.Dense)
+	M.Mul(rbf.Weight.T(), gradient.T())
+	return M.RawMatrix().Data
+}
+
 func RBFRegression() {
 	csvfile, err := os.Open("../dataset/polynomial_regression_data.csv")
 	if err != nil {
@@ -107,7 +117,7 @@ func RBFRegression() {
 		log.Fatal(err)
 	}
 	n_rows := len(lines)
-	n_cols := 5
+	n_cols := 7
 	y_dense := mat.NewDense(n_rows-1, 1, nil)
 	X_dense := mat.NewDense(n_rows-1, n_cols, nil)
 
@@ -121,8 +131,27 @@ func RBFRegression() {
 		}
 	}
 
-	RBF := RBFRegressionStruct{NumCenters: 20, Centers: nil, Beta: 4.0, Factoriation: SVD}
+	RBF := RBFRegressionStruct{NumCenters: 50, Centers: nil, Beta: 4.0, Factoriation: SVD}
 	RBF.SetCenters(X_dense)
 	RBF.Fit(X_dense, y_dense)
+	y_hat := RBF.Predict(X_dense)
+
+	idx := []float64{}
+	for i := 0; i < len(y_hat); i++ {
+		idx = append(idx, float64(i*2))
+	}
+
+	p := plot.New()
+
+	p.Title.Text = "RBF Regression"
+
+	plotutil.AddScatters(p,
+		"Original", GeneratePoints(idx, y_dense.RawMatrix().Data),
+		fmt.Sprintf("RBF %.3f", r2(y_hat, y_dense.RawMatrix().Data)), GeneratePoints(idx, y_hat),
+	)
+
+	if err := p.Save(7*vg.Inch, 7*vg.Inch, "rbf_regression_golang.png"); err != nil {
+		panic(err)
+	}
 
 }
