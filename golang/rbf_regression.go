@@ -78,7 +78,14 @@ func (rbf *RBFRegressionStruct) Fit(X mat.Matrix, y mat.Matrix) {
 	q := new(mat.Dense)
 	reg := new(mat.Dense)
 
-	qr.Factorize(gradient)
+	var respGradient mat.Dense
+	respGradient.Mul(gradient.T(), gradient)
+	n_row_dense, n_col_dense := respGradient.Dims()
+	qr.Factorize(mat.NewDense(n_row_dense, n_col_dense, respGradient.RawMatrix().Data))
+
+	var respY mat.Dense
+	respY.Mul(gradient.T(), y)
+	n_row_dense, n_col_dense = respY.Dims()
 
 	qr.QTo(q)
 	qr.RTo(reg)
@@ -86,7 +93,8 @@ func (rbf *RBFRegressionStruct) Fit(X mat.Matrix, y mat.Matrix) {
 	qtr := q.T()
 
 	qty := new(mat.Dense)
-	qty.Mul(qtr, y)
+
+	qty.Mul(qtr, mat.NewDense(n_row_dense, n_col_dense, respY.RawMatrix().Data))
 
 	c := make([]float64, n_cols_gradient)
 	for i := n_cols_gradient - 1; i >= 0; i-- {
@@ -131,8 +139,9 @@ func RBFRegression() {
 		}
 	}
 
-	RBF := RBFRegressionStruct{NumCenters: 50, Centers: nil, Beta: 4.0, Factoriation: SVD}
+	RBF := RBFRegressionStruct{NumCenters: 28, Centers: nil, Beta: 4.0, Factoriation: SVD}
 	RBF.SetCenters(X_dense)
+
 	RBF.Fit(X_dense, y_dense)
 	y_hat := RBF.Predict(X_dense)
 
