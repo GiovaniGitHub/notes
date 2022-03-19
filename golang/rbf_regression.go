@@ -17,11 +17,10 @@ import (
 )
 
 type RBFRegressionStruct struct {
-	NumCenters   int
-	Centers      mat.Matrix
-	Beta         float64
-	Weight       mat.Matrix
-	Factoriation TypeFactoration
+	NumCenters int
+	Centers    mat.Matrix
+	Beta       float64
+	Weight     mat.Matrix
 }
 
 func (rbf *RBFRegressionStruct) SetCenters(X mat.Matrix) {
@@ -70,42 +69,28 @@ func (rbf *RBFRegressionStruct) CalculateGradient(X mat.Matrix) mat.Matrix {
 	return gradientArray
 }
 
-func (rbf *RBFRegressionStruct) Fit(X mat.Matrix, y mat.Matrix) {
+func (rbf *RBFRegressionStruct) Fit(X mat.Matrix, y mat.Matrix, Type TypeFactoration) {
 	gradient := rbf.CalculateGradient(X)
-	_, n_cols_gradient := gradient.Dims()
-
-	qr := new(mat.QR)
-	q := new(mat.Dense)
-	reg := new(mat.Dense)
-
-	var respGradient mat.Dense
-	respGradient.Mul(gradient.T(), gradient)
-	n_row_dense, n_col_dense := respGradient.Dims()
-	qr.Factorize(mat.NewDense(n_row_dense, n_col_dense, respGradient.RawMatrix().Data))
-
-	var respY mat.Dense
-	respY.Mul(gradient.T(), y)
-	n_row_dense, n_col_dense = respY.Dims()
-
-	qr.QTo(q)
-	qr.RTo(reg)
-
-	qtr := q.T()
-
-	qty := new(mat.Dense)
-
-	qty.Mul(qtr, mat.NewDense(n_row_dense, n_col_dense, respY.RawMatrix().Data))
-
-	c := make([]float64, n_cols_gradient)
-	for i := n_cols_gradient - 1; i >= 0; i-- {
-		c[i] = qty.At(i, 0)
-		for j := i + 1; j < n_cols_gradient; j++ {
-			c[i] -= c[j] * reg.At(i, j)
-		}
-		c[i] /= reg.At(i, i)
+	switch Type {
+	case QR:
+		qr := new(mat.QR)
+		qr.Factorize(gradient)
+		resp := new(mat.Dense)
+		qr.SolveTo(resp, false, y)
+		rbf.Weight = resp
+	case SVD:
+		svd := new(mat.SVD)
+		svd.Factorize(gradient, mat.SVDFull)
+		resp := new(mat.Dense)
+		svd.SolveTo(resp, y, rbf.NumCenters)
+		rbf.Weight = resp
+	default:
+		svd := new(mat.SVD)
+		svd.Factorize(gradient, mat.SVDFull)
+		resp := new(mat.Dense)
+		svd.SolveTo(resp, y, rbf.NumCenters)
+		rbf.Weight = resp
 	}
-
-	rbf.Weight = mat.NewDense(n_cols_gradient, 1, c)
 }
 
 func (rbf *RBFRegressionStruct) Predict(X mat.Matrix) []float64 {
@@ -139,14 +124,19 @@ func RBFRegression() {
 		}
 	}
 
-	RBF := RBFRegressionStruct{NumCenters: 28, Centers: nil, Beta: 4.0, Factoriation: SVD}
+	RBF := RBFRegressionStruct{NumCenters: 20, Centers: nil, Beta: 4.0}
 	RBF.SetCenters(X_dense)
 
-	RBF.Fit(X_dense, y_dense)
-	y_hat := RBF.Predict(X_dense)
+	RBF.Fit(X_dense, y_dense, SVD)
+	y_hat_svd := RBF.Predict(X_dense)
+
+	RBF.Weight = nil
+
+	RBF.Fit(X_dense, y_dense, QR)
+	y_hat_qr := RBF.Predict(X_dense)
 
 	idx := []float64{}
-	for i := 0; i < len(y_hat); i++ {
+	for i := 0; i < len(y_hat_svd); i++ {
 		idx = append(idx, float64(i*2))
 	}
 
@@ -156,7 +146,8 @@ func RBFRegression() {
 
 	plotutil.AddScatters(p,
 		"Original", GeneratePoints(idx, y_dense.RawMatrix().Data),
-		fmt.Sprintf("RBF %.3f", r2(y_hat, y_dense.RawMatrix().Data)), GeneratePoints(idx, y_hat),
+		fmt.Sprintf("SVD %.3f", r2(y_hat_svd, y_dense.RawMatrix().Data)), GeneratePoints(idx, y_hat_svd),
+		fmt.Sprintf("QR %.3f", r2(y_hat_qr, y_dense.RawMatrix().Data)), GeneratePoints(idx, y_hat_qr),
 	)
 
 	if err := p.Save(7*vg.Inch, 7*vg.Inch, "rbf_regression_golang.png"); err != nil {
