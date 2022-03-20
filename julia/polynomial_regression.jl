@@ -9,8 +9,29 @@
 using DataFrames
 using CSV
 using Plots
+using Statistics
 include("utils.jl")
 include("gradients.jl")
+function estimate_coef_elastic_net(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epochs::Int, learning_rate::Float64, ridge_coef::Float64, lasso_coef::Float64)
+    X = expand_matrix(x, degrees)
+    w = zeros(n_cols,1)
+    skip = False
+    losses = []
+    count_iter = 0
+    while not skip
+        count_iter+=1
+        y_hat = X*w
+        dif = (transpose(X) * (y_hat - y))
+
+        dw = learning_rate*(dif + ridge_coef*sign.(w) + lasso_coef*2*w)
+        w = w - dw
+        mse_value = mse(y_hat, y)
+        
+        append!(losses, mse_value)
+        if Statistics.mean(abs.(dw)) <= tol
+            skip = True
+        if count_iter==max_iterators
+            skip = True
 
 function estimate_coef(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epochs::Int, learning_rate::Float64, 
     func_adjust::Function)
