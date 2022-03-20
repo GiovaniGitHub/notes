@@ -10,33 +10,41 @@ using DataFrames
 using CSV
 using Plots
 using Statistics
+
 include("utils.jl")
 include("gradients.jl")
-function estimate_coef_elastic_net(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epochs::Int, learning_rate::Float64, ridge_coef::Float64, lasso_coef::Float64)
+
+function estimate_coef_elastic_net(x::Matrix{Float64}, y::Matrix{Float64}, degrees::Int, learning_rate::Float64, ridge_coef::Float64, lasso_coef::Float64, tol::Float64, max_iterators:: Int)
     X = expand_matrix(x, degrees)
-    w = zeros(n_cols,1)
-    skip = False
+    _, n_cols = size(X)
+    w = ones(n_cols,1)
+    skip = false
     losses = []
     count_iter = 0
-    while not skip
+    while ~skip
         count_iter+=1
         y_hat = X*w
         dif = (transpose(X) * (y_hat - y))
 
-        dw = learning_rate*(dif + ridge_coef*sign.(w) + lasso_coef*2*w)
+        dw = learning_rate.*(dif.+ ridge_coef.*sign.(w) + 2*lasso_coef.*w)
         w = w - dw
         mse_value = mse(y_hat, y)
         
         append!(losses, mse_value)
         if Statistics.mean(abs.(dw)) <= tol
-            skip = True
+            skip = true
+        end
         if count_iter==max_iterators
-            skip = True
+            skip = true
+        end
+    end
+    return w, losses
+end
 
-function estimate_coef(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epochs::Int, learning_rate::Float64, 
+function estimate_coef(x::Matrix{Float64}, y::Matrix{Float64}, degrees::Int, epochs::Int, learning_rate::Float64, 
     func_adjust::Function)
     X = expand_matrix(x, degrees)
-    n_rows, n_cols = size(X)
+    _, n_cols = size(X)
 
     w = zeros(n_cols,1)
     b = 0
@@ -56,7 +64,7 @@ function estimate_coef(x::Vector{Float64}, y::Vector{Float64}, degrees::Int, epo
 
 end
 
-function estimate_coef_with_batch(x::Matrix{Float64}, y::Matrix{Float64}, bs::Int, degrees::Int, epochs::Int,
+function estimate_coef_with_batch(x::Matrix{Float64}, y::Matrix{Float64}, bs::Int, degrees::Int, epochs::Int64,
                                   learning_rate::Float64, func_adjust::Function)
     X = expand_matrix(x, degrees)
     n_rows, n_cols = size(X)
@@ -97,15 +105,20 @@ function main()
 
     x_train, y_train, x_test, y_test = split_dataset(X, y, 0.7)
 
-    w, b, losses = estimate_coef_with_batch(x_train, y_train, 10, 14, 2000, 0.01, update_weights_mae)
+    w_batch, b_batch, losses_batch = estimate_coef_with_batch(x_train, y_train, 10, 14, 2000, 0.01, update_weights_mse)
+    w_elastict, losses_elastic = estimate_coef_elastic_net(x_train, y_train, 14, 1e-3, 0.6, 0.2, 1e-10, Int(20000))
 
     X_test = expand_matrix(x_test, 14)
-    y_hat = X_test * w .+ b
-    yy = [y_test, y_hat]
-    r = sum(losses)/length(losses)
+    y_hat_elastic = X_test * w_elastict
+    y_hat_batch = X_test * w_batch .+ b_batch
 
-    pp = plot(x_test, yy, title = "Polynomial Linear Regression: \n $r",seriestype = :scatter,
-                label = ["Original" "Predicted"], lw = 2)
+    yy = [y_test, y_hat_elastic, y_hat_batch]
+    
+    r_elastic = sum(losses_elastic)/length(losses_elastic)
+    r_batch = sum(losses_batch)/length(losses_batch)
+
+    pp = plot(x_test, yy, title = "Polynomial Linear Regression", seriestype = :scatter,
+                label = ["Original" "Predicted Elastic: $r_elastic" "Predicted Batch: $r_batch"], lw = 2)
                 
     savefig(pp, "polynomial_linear_regression.png")
 end
