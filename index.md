@@ -1,11 +1,16 @@
-## Welcome to GitHub Pages
+## Notes
 
-You can use the [editor on GitHub](https://github.com/GiovaniGitHub/notes/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+This repository aims to record implementations, ideas and analyzes of various statistical and machine learning algorithms developed in some languages such as Java, Go, Python, Julia and Rust.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Algorithms
+* Linear Regression
+* Simple Linear Regression
+* Polynomial Regression
+* Logistic Regression
+* Elastic Net Regression
+* RBF Regression
 
-### Markdown
-
+<!---
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
 ```markdown
@@ -35,3 +40,4 @@ Your Pages site will use the layout and styles from the Jekyll theme you have se
 ### Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+-->
