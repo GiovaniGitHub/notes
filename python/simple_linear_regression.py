@@ -5,14 +5,14 @@ from math import sqrt
 def estimate_coef(x, y):
     n = len(x)
 
-    SS_xy = sum(y*x.T) - y.sum()*x.sum()/n
-    SS_xx = sum(x*x.T) - x.sum()*x.sum()/n
-    SS_yy = sum(y*y.T) - y.sum()*y.sum()/n
+    SS_xy = sum(y * x.T) - y.sum() * x.sum() / n
+    SS_xx = sum(x * x.T) - x.sum() * x.sum() / n
+    SS_yy = sum(y * y.T) - y.sum() * y.sum() / n
 
     b_1 = SS_xy / SS_xx
-    b_0 = y.mean() - b_1*x.mean()
+    b_0 = y.mean() - b_1 * x.mean()
 
-    r = SS_xy/(sqrt(SS_xx*SS_yy))
+    r = SS_xy / (sqrt(SS_xx * SS_yy))
 
     return (b_0, b_1, r)
 
@@ -30,8 +30,8 @@ if __name__ == "__main__":
 
     from matplotlib import pyplot as plt
 
-    plt.scatter(x, y, c='k', label='Original')
-    plt.scatter(x, y_hat, c='g', label='Predicted')
+    plt.scatter(x, y, c="k", label="Original")
+    plt.scatter(x, y_hat, c="g", label="Predicted")
     plt.title(f"y = {round(b_1,3)}x + {round(b_0,3)}")
     plt.legend()
     plt.show()

@@ -4,7 +4,7 @@ from utils import split_dataset
 
 
 def sigmoid(z):
-    return 1/(1+exp(-z))
+    return 1 / (1 + exp(-z))
 
 
 def estimate_coef(X, y, iterations, learning_rate):
@@ -18,24 +18,24 @@ def estimate_coef(X, y, iterations, learning_rate):
         z = dot(X, w) + b
         pred = sigmoid(z)
 
-        cost = (-1/n_rows)*sum(dot(y.T, log(pred)) + dot(1-y.T, log(1-pred)))
+        cost = (-1 / n_rows) * sum(dot(y.T, log(pred)) + dot(1 - y.T, log(1 - pred)))
         loss.append(cost)
 
-        dw = (1/n_rows)*dot(X.T, (pred-y))
-        db = (1/n_rows)*sum(pred-y)
+        dw = (1 / n_rows) * dot(X.T, (pred - y))
+        db = (1 / n_rows) * sum(pred - y)
 
-        w = w - learning_rate*dw
-        b = b - learning_rate*db
+        w = w - learning_rate * dw
+        b = b - learning_rate * db
 
     return w, b, loss
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('../dataset/logistic_regression.csv')
+    df = pd.read_csv("../dataset/logistic_regression.csv")
 
     y = df.y.values
     y = y.reshape(len(y), 1)
-    X = df[df.columns.drop('y')].values
+    X = df[df.columns.drop("y")].values
 
     X_train, y_train, X_test, y_test = split_dataset(X, y, 0.8)
 
