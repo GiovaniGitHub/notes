@@ -1,34 +1,33 @@
+from enum import Enum
 import numpy as np
 import pandas as pd
 from scipy.spatial.distance import cdist
-from sklearn import neighbors
 
 from utils import split_dataset
 
-DISTANCES_TYPES = [
-    "braycurtis",
-    "canberra",
-    "chebyshev",
-    "cityblock",
-    "correlation",
-    "cosine",
-    "dice",
-    "euclidean",
-    "hamming",
-    "jaccard",
-    "jensenshannon",
-    "kulsinski",
-    "mahalanobis",
-    "matching",
-    "minkowski",
-    "rogerstanimoto",
-    "russellrao",
-    "seuclidean",
-    "sokalmichener",
-    "sokalsneath",
-    "sqeuclidean",
-    "yule",
-]
+class DistanceTypes(Enum):
+    BRAYCURTIS:"braycurtis"
+    CANBERRA:"canberra"
+    CHEBYSHEV:"chebyshev"
+    CITYBLOCK:"cityblock"
+    CORRELATION:"correlation"
+    COSINE:"cosine"
+    DICE:"dice"
+    EUCLIDEAN:"euclidean"
+    HAMMING:"hamming"
+    JACCARD:"jaccard"
+    JENSENSHANNON:"jensenshannon"
+    KULSINSKI:"kulsinski"
+    MAHALANOBIS:"mahalanobis"
+    MATCHING:"matching"
+    MINKOWSKI:"minkowski"
+    ROGERSTANIMOTO:"rogerstanimoto"
+    RUSSELLRAO:"russellrao"
+    SEUCLIDEAN:"seuclidean"
+    SOKALMICHENER:"sokalmichener"
+    SOKALSNEATH:"sokalsneath"
+    SQEUCLIDEAN:"sqeuclidean"
+    YULE:"yule"
 
 
 class KNearestNeighbors:
@@ -59,7 +58,7 @@ class KNearestNeighbors:
         except Exception as e:
             raise e
 
-    def predict(self, X_classifier, distance):
+    def predict(self, X_classifier, distance: DistanceTypes):
         return [self.__get_labels_neighborhood(row, distance) for row in X_classifier]
 
 
@@ -80,9 +79,9 @@ if __name__ == "__main__":
     n_neighbors = 15
 
     knn = KNearestNeighbors(X_train, y_train, n_neighbors)
-    for type_distance in DISTANCES_TYPES:
+    for type_distance in DistanceTypes:
         try:
-            y_hat = np.array(knn.predict(X_test, type_distance))
+            y_hat = np.array(knn.predict(X_test, type_distance.value))
             y_test = np.ndarray.flatten(np.array(y_test))
             
             acc = sum(((y_hat == y_test)*1.0))/len(y_test)
