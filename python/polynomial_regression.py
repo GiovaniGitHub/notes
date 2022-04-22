@@ -1,15 +1,12 @@
-from gradients import (
-    adjust_weights,
-    adjust_weights_with_batch,
-    update_weights_mae,
-    update_weights_huber,
-    update_weights_mse,
-)
 import pandas as pd
-from numpy import dot, zeros, array, sqrt, sign, random, mean, abs
+from numpy import abs, array, dot, mean, random, sign, sqrt, zeros
 from numpy.linalg import solve
-from utils import randomize_dataset
+
+from gradients import (adjust_weights, adjust_weights_with_batch,
+                       update_weights_huber, update_weights_mae,
+                       update_weights_mse)
 from rbf_regression import RBFRegression
+from utils import randomize_dataset
 
 
 def expand_matrix(x, max_coef, min_coef=0):

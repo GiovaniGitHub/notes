@@ -1,9 +1,11 @@
 from enum import Enum
+
 import numpy as np
 import pandas as pd
 from scipy.spatial.distance import cdist
 
 from utils import split_dataset
+
 
 class DistanceTypes(Enum):
     BRAYCURTIS="braycurtis"

@@ -1,5 +1,6 @@
-from numpy import exp, zeros, dot, sum, log, mean
 import pandas as pd
+from numpy import dot, exp, log, mean, sum, zeros
+
 from utils import split_dataset
 
 

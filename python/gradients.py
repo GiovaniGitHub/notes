@@ -1,4 +1,5 @@
-from numpy import dot, sum, abs, array, random
+from numpy import abs, array, dot, random, sum
+
 from utils import mse
 
 

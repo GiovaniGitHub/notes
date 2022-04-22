@@ -1,5 +1,6 @@
-import pandas as pd
 from math import sqrt
+
+import pandas as pd
 
 
 def estimate_coef(x, y):

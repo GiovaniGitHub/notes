@@ -1,4 +1,4 @@
-from numpy import mean, array
+from numpy import array, mean
 from numpy.random import permutation
 
 

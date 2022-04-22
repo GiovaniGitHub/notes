@@ -1,6 +1,7 @@
 import pandas as pd
+from numpy import append, dot
 from numpy.linalg import inv
-from numpy import dot, append
+
 from utils import r2_score
 
 
