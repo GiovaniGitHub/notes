@@ -6,28 +6,28 @@ from scipy.spatial.distance import cdist
 from utils import split_dataset
 
 class DistanceTypes(Enum):
-    BRAYCURTIS:"braycurtis"
-    CANBERRA:"canberra"
-    CHEBYSHEV:"chebyshev"
-    CITYBLOCK:"cityblock"
-    CORRELATION:"correlation"
-    COSINE:"cosine"
-    DICE:"dice"
-    EUCLIDEAN:"euclidean"
-    HAMMING:"hamming"
-    JACCARD:"jaccard"
-    JENSENSHANNON:"jensenshannon"
-    KULSINSKI:"kulsinski"
-    MAHALANOBIS:"mahalanobis"
-    MATCHING:"matching"
-    MINKOWSKI:"minkowski"
-    ROGERSTANIMOTO:"rogerstanimoto"
-    RUSSELLRAO:"russellrao"
-    SEUCLIDEAN:"seuclidean"
-    SOKALMICHENER:"sokalmichener"
-    SOKALSNEATH:"sokalsneath"
-    SQEUCLIDEAN:"sqeuclidean"
-    YULE:"yule"
+    BRAYCURTIS="braycurtis"
+    CANBERRA="canberra"
+    CHEBYSHEV="chebyshev"
+    CITYBLOCK="cityblock"
+    CORRELATION="correlation"
+    COSINE="cosine"
+    DICE="dice"
+    EUCLIDEAN="euclidean"
+    HAMMING="hamming"
+    JACCARD="jaccard"
+    JENSENSHANNON="jensenshannon"
+    KULSINSKI="kulsinski"
+    MAHALANOBIS="mahalanobis"
+    MATCHING="matching"
+    MINKOWSKI="minkowski"
+    ROGERSTANIMOTO="rogerstanimoto"
+    RUSSELLRAO="russellrao"
+    SEUCLIDEAN="seuclidean"
+    SOKALMICHENER="sokalmichener"
+    SOKALSNEATH="sokalsneath"
+    SQEUCLIDEAN="sqeuclidean"
+    YULE="yule"
 
 
 class KNearestNeighbors:
@@ -85,6 +85,6 @@ if __name__ == "__main__":
             y_test = np.ndarray.flatten(np.array(y_test))
             
             acc = sum(((y_hat == y_test)*1.0))/len(y_test)
-            print(f"Type of Distance {type_distance} Acurácia: {acc}")
+            print(f"Type of Distance {type_distance.value} Acurácia: {acc}")
         except:
-            print(f"This distance type {type_distance} can't calculate")
+            print(f"This distance type {type_distance.value} can't calculate")
