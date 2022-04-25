@@ -14,6 +14,7 @@ import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class App extends Application {
     RBFRegression rbf;
@@ -168,6 +169,10 @@ public class App extends Application {
                 scene = new Scene(
                         createScatterChart(xAxis, datasetRBF.y, yHatList, yHatNames, "RBF Regression"));
                 stage.setScene(scene);
+                break;
+            case "knn":
+                KNN.Dataset datasetKNN = KNN.readDataset("../dataset/knn_classification.csv", 10);
+                Arrays.stream(datasetKNN.y).forEach(System.out::println);
                 break;
             default:
                 System.out.println("Please run argument simple|linear|poly|rbf");
