@@ -172,7 +172,16 @@ public class App extends Application {
                 break;
             case "knn":
                 KNN.Dataset datasetKNN = KNN.readDataset("../dataset/knn_classification.csv", 10);
-                Arrays.stream(datasetKNN.y).forEach(System.out::println);
+                Map<String, KNN.Dataset> newDataSet = KNN.getTrainTest(datasetKNN.X, datasetKNN.y, 0.8);
+                int count = 0;
+                for(int i=0; i<newDataSet.get("datasetTest").X.length; i++){
+                    double[] pattern = newDataSet.get("datasetTest").X[i];
+                    Integer yHatKNN = KNN.predict(newDataSet.get("datasetTrain"), pattern, 20);
+                    if ((int) newDataSet.get("datasetTest").y[i] == yHatKNN){
+                        count = count + 1;
+                    }
+               }
+               System.out.println("Accuracy: " + (((double) count )/ newDataSet.get("datasetTest").y.length ) );
                 break;
             default:
                 System.out.println("Please run argument simple|linear|poly|rbf");
