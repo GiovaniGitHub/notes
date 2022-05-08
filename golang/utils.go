@@ -196,3 +196,15 @@ func Counter(v []int) map[int]int {
 
 	return freq
 }
+
+func Unique(v []int) []int {
+	keys := make(map[int]bool)
+	list := []int{}
+	for _, entry := range v {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
