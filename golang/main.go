@@ -17,5 +17,9 @@ func main() {
 
 	case "rbf":
 		RBFRegression()
+
+	case "knn":
+		KNNClassifier()
 	}
+
 }
