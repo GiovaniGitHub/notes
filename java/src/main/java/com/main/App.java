@@ -14,7 +14,6 @@ import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class App extends Application {
     RBFRegression rbf;
