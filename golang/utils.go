@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -109,20 +110,20 @@ func SplitDataset(X mat.Matrix, y mat.Matrix, percent float64) (mat.Matrix, mat.
 	y_train_dense := mat.NewDense(qtd_training, 1, nil)
 	X_train_dense := mat.NewDense(qtd_training, n_cols, nil)
 
-	y_test_dense := mat.NewDense(qtd_training, 1, nil)
-	X_test_dense := mat.NewDense(qtd_training, n_cols, nil)
+	y_test_dense := mat.NewDense(n_rows-qtd_training, 1, nil)
+	X_test_dense := mat.NewDense(n_rows-qtd_training, n_cols, nil)
 
 	for i := 0; i < n_rows; i++ {
-		if i <= qtd_training {
+		if i < qtd_training {
 			for j := 0; j < n_cols; j++ {
 				X_train_dense.Set(i, j, X.At(i, j))
-				y_train_dense.Set(i, 0, y.At(i, 0))
 			}
+			y_train_dense.Set(i, 0, y.At(i, 0))
 		} else {
 			for j := 0; j < n_cols; j++ {
-				X_test_dense.Set(i, j, X.At(i, j))
-				y_test_dense.Set(i, 0, y.At(i, 0))
+				X_test_dense.Set(i-qtd_training, j, X.At(i, j))
 			}
+			y_test_dense.Set(i-qtd_training, 0, y.At(i, 0))
 		}
 	}
 
@@ -136,4 +137,62 @@ func GetRowMatrix(x mat.Matrix, idx int) mat.Matrix {
 		row_data[ii] = x.At(idx, ii)
 	}
 	return mat.NewDense(1, n_cols_data, row_data)
+}
+
+func GetRowData(x mat.Matrix, idx int) []float64 {
+	_, n_cols_data := x.Dims()
+	row_data := make([]float64, n_cols_data)
+	for ii := 0; ii < n_cols_data; ii++ {
+		row_data[ii] = x.At(idx, ii)
+	}
+	return row_data
+}
+
+func EuclideanDistance(v1 []float64, v2 []float64) float64 {
+	if len(v1) != len(v2) {
+		fmt.Errorf("Need same dimension")
+	}
+	acc := 0.0
+	for ii := 0; ii < len(v1); ii++ {
+		acc += math.Pow(v1[ii]-v2[ii], 2)
+	}
+	return math.Sqrt(acc)
+}
+
+func Cosine(a []float64, b []float64) float64 {
+	count := 0
+	length_a := len(a)
+	length_b := len(b)
+	if length_a > length_b {
+		count = length_a
+	} else {
+		count = length_b
+	}
+	sumA := 0.0
+	s1 := 0.0
+	s2 := 0.0
+	for k := 0; k < count; k++ {
+		if k >= length_a {
+			s2 += math.Pow(b[k], 2)
+			continue
+		}
+		if k >= length_b {
+			s1 += math.Pow(a[k], 2)
+			continue
+		}
+		sumA += a[k] * b[k]
+		s1 += math.Pow(a[k], 2)
+		s2 += math.Pow(b[k], 2)
+	}
+
+	return (sumA / (math.Sqrt(s1) * math.Sqrt(s2)))
+}
+
+func Counter(v []int) map[int]int {
+	freq := make(map[int]int)
+	for _, num := range v {
+		freq[num] = freq[num] + 1
+	}
+
+	return freq
 }
