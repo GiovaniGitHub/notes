@@ -1,3 +1,4 @@
+use rust_regressions::clusters::knn::{self, KNN};
 use rust_regressions::regressions::{
     linear_regression::LinearRegression, polynomial_regression::PolynomialRegression,
     rbf_regression::RBFRegression, simple_linear_regression::SimpleLinearRegression,
@@ -5,6 +6,7 @@ use rust_regressions::regressions::{
 use rust_regressions::utils::io::{line_and_scatter_plot, parse_csv};
 use rust_regressions::utils::types::{TypeFactoration, TypeRegression};
 
+use smartcore::cluster;
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 
 use smartcore::linalg::BaseMatrix;
@@ -129,6 +131,22 @@ fn main() -> std::io::Result<()> {
                 "predicted QR",
             ],
         )
+    } else if type_regression == "knn" {
+        let file: File = File::open(format!("../dataset/{}.csv", dataset_name_file)).unwrap();
+        let tuple_result: (usize, usize, Vec<f32>) = parse_csv(BufReader::new(file)).unwrap();
+        let dense_matrix = DenseMatrix::from_vec(tuple_result.0, tuple_result.1, &tuple_result.2);
+
+        let y = dense_matrix.slice(10..tuple_result.0, tuple_result.1 - 1..tuple_result.1);
+        let x = dense_matrix.slice(10..tuple_result.0, 1..2);
+        
+        let y_test = dense_matrix.slice(0..10, tuple_result.1 - 1..tuple_result.1);
+        let x_test = dense_matrix.slice(0..10, 1..2);
+
+        let mut model = KNN::new(x, y, 5);
+        for i in 0..10 {
+            let class = model.predict(x_test.get_row(i));
+            println!("{:?}", (class, y_test.get_row(i)[0]));
+        }
     }
 
     Ok(())

@@ -22,7 +22,6 @@ impl LinearRegression {
         
         self.coefficients = Some(svd_result.slice(0..num_attributes, 0..1));
         self.bias = Some(svd_result.get(num_attributes,0));
-
     }
 
     pub fn predict(&self, x: &DenseMatrix<f32>) -> DenseMatrix<f32>{
