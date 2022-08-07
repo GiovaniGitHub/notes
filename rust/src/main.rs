@@ -1,4 +1,4 @@
-use rust_regressions::clusters::knn::{self, KNN};
+use rust_regressions::clusters::knn::{KNN};
 use rust_regressions::regressions::{
     linear_regression::LinearRegression, polynomial_regression::PolynomialRegression,
     rbf_regression::RBFRegression, simple_linear_regression::SimpleLinearRegression,
@@ -6,7 +6,6 @@ use rust_regressions::regressions::{
 use rust_regressions::utils::io::{line_and_scatter_plot, parse_csv};
 use rust_regressions::utils::types::{TypeFactoration, TypeRegression};
 
-use smartcore::cluster;
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 
 use smartcore::linalg::BaseMatrix;
@@ -115,7 +114,6 @@ fn main() -> std::io::Result<()> {
         rbf.fit(&x, &y);
         let y_hat_qr = rbf.predict(&x);
 
-
         line_and_scatter_plot(
             x.clone().to_row_vector(),
             vec![
@@ -138,7 +136,7 @@ fn main() -> std::io::Result<()> {
 
         let y = dense_matrix.slice(10..tuple_result.0, tuple_result.1 - 1..tuple_result.1);
         let x = dense_matrix.slice(10..tuple_result.0, 1..2);
-        
+
         let y_test = dense_matrix.slice(0..10, tuple_result.1 - 1..tuple_result.1);
         let x_test = dense_matrix.slice(0..10, 1..2);
 

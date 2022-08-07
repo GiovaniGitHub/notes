@@ -6,7 +6,7 @@ use smartcore::linalg::{
 };
 
 pub struct KNN {
-    pub X: DenseMatrix<f32>,
+    pub x: DenseMatrix<f32>,
     pub y: DenseMatrix<f32>,
     pub n_neighborhood: usize,
 }
@@ -26,18 +26,18 @@ impl NeighborhoodItem {
 }
 
 impl KNN {
-    pub fn new(X: DenseMatrix<f32>, y: DenseMatrix<f32>, n_neighborhood: usize) -> KNN {
+    pub fn new(x: DenseMatrix<f32>, y: DenseMatrix<f32>, n_neighborhood: usize) -> KNN {
         KNN {
-            X,
+            x,
             y,
             n_neighborhood,
         }
     }
 
     pub fn predict(&mut self, v: Vec<f32>) -> String {
-        let mut neighborhood_list = Vec::with_capacity(self.X.shape().0);
-        for i in 0..self.X.shape().0 {
-            let dist: f32 = self.X.get_row(i).sub(&v).iter().map(|r| r.powf(2.0)).sum();
+        let mut neighborhood_list = Vec::with_capacity(self.x.shape().0);
+        for i in 0..self.x.shape().0 {
+            let dist: f32 = self.x.get_row(i).sub(&v).iter().map(|r| r.powf(2.0)).sum();
             let mut neighborhood_item = NeighborhoodItem::new();
 
             neighborhood_item.dist = dist;
