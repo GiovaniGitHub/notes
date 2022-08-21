@@ -1,11 +1,13 @@
-use rust_regressions::clusters::knn::{KNN};
+use rust_regressions::clusters::knn::KNN;
 use rust_regressions::regressions::{
     linear_regression::LinearRegression, polynomial_regression::PolynomialRegression,
     rbf_regression::RBFRegression, simple_linear_regression::SimpleLinearRegression,
 };
 use rust_regressions::utils::io::{line_and_scatter_plot, parse_csv};
 use rust_regressions::utils::types::{TypeFactoration, TypeRegression};
+use rust_regressions::utils::utils::accuracy;
 
+use rust_regressions::utils::utils::train_test_split;
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 
 use smartcore::linalg::BaseMatrix;
@@ -134,17 +136,19 @@ fn main() -> std::io::Result<()> {
         let tuple_result: (usize, usize, Vec<f32>) = parse_csv(BufReader::new(file)).unwrap();
         let dense_matrix = DenseMatrix::from_vec(tuple_result.0, tuple_result.1, &tuple_result.2);
 
-        let y = dense_matrix.slice(10..tuple_result.0, tuple_result.1 - 1..tuple_result.1);
-        let x = dense_matrix.slice(10..tuple_result.0, 1..2);
+        let y = dense_matrix.slice(0..tuple_result.0, tuple_result.1 - 1..tuple_result.1);
+        let x = dense_matrix.slice(0..tuple_result.0, 1..3);
 
-        let y_test = dense_matrix.slice(0..10, tuple_result.1 - 1..tuple_result.1);
-        let x_test = dense_matrix.slice(0..10, 1..2);
+        let (x_train, x_test, y_train, y_test) = train_test_split(x, y, 0.5, true);
 
-        let mut model = KNN::new(x, y, 5);
-        for i in 0..10 {
-            let class = model.predict(x_test.get_row(i));
-            println!("{:?}", (class, y_test.get_row(i)[0]));
+        let mut model = KNN::new(x_train, y_train, 5);
+
+        let mut y_target = Vec::new();
+        for i in 0..x_test.shape().0 {
+            y_target.push(model.predict(x_test.get_row(i)).parse::<f32>().unwrap());
         }
+
+        println!("Accuracy: {}", accuracy(y_target, y_test.get_col_as_vec(0)));
     }
 
     Ok(())
