@@ -2,9 +2,13 @@ import pandas as pd
 from numpy import abs, array, dot, mean, random, sign, sqrt, zeros
 from numpy.linalg import solve
 
-from gradients import (adjust_weights, adjust_weights_with_batch,
-                       update_weights_huber, update_weights_mae,
-                       update_weights_mse)
+from gradients import (
+    adjust_weights,
+    adjust_weights_with_batch,
+    update_weights_huber,
+    update_weights_mae,
+    update_weights_mse,
+)
 from rbf_regression import RBFRegression
 from utils import randomize_dataset
 
@@ -12,7 +16,7 @@ from utils import randomize_dataset
 def expand_matrix(x, max_coef, min_coef=0):
     result = []
     for v in x:
-        result.append([v ** i for i in range(min_coef, max_coef + 1)])
+        result.append([v**i for i in range(min_coef, max_coef + 1)])
 
     return array(result)
 
